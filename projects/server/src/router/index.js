@@ -1,4 +1,4 @@
-// const authRouter = require("./authRouter");
+const authRouter = require("./authRouter");
 // const productRouter = require("./productRouter");
 // const profileRouter = require("./profileRouter");
 // const cashierRouter = require("./cashierRouter");
@@ -7,7 +7,7 @@
 // const reportRouter = require("./reportRouter");
 
 module.exports = {
-//   authRouter,
+  authRouter,
 //   productRouter,
 //   profileRouter,
 //   cashierRouter,
