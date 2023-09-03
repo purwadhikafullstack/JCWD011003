@@ -2,7 +2,7 @@ require("dotenv/config");
 const express = require("express");
 const cors = require("cors");
 const { join } = require("path");
-
+const apiRouter = express.Router();
 const PORT = process.env.PORT || 8000;
 const app = express();
 app.use(
@@ -15,21 +15,24 @@ app.use(
 );
 
 app.use(express.json());
-
+const db = require('./models')
+// db.sequelize.sync({alter: true})
+app.use('/api', apiRouter)
+const {authRouter} = require('./router')
 //#region API ROUTES
 
 // ===========================
 // NOTE : Add your routes here
+apiRouter.use('/auth', authRouter)
+// app.get("/api", (req, res) => {
+//   res.send(`Hello, this is my API`);
+// });
 
-app.get("/api", (req, res) => {
-  res.send(`Hello, this is my API`);
-});
-
-app.get("/api/greetings", (req, res, next) => {
-  res.status(200).json({
-    message: "Hello, Student !",
-  });
-});
+// app.get("/api/greetings", (req, res, next) => {
+//   res.status(200).json({
+//     message: "Hello, Student !",
+//   });
+// });
 
 // ===========================
 
