@@ -8,4 +8,9 @@ const router = express.Router();
 // router.patch("/auth/reset-password", verifyToken, validateResetPassword, validate, authControllers.resetPassword);
 // router.post("/auth/login",  authControllers.login);
 
+router.get("/tes", (req, res) => {
+    res.send(`jancookk`);
+  });
+  
+
 module.exports = router;
