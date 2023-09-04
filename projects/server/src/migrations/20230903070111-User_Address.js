@@ -17,7 +17,7 @@ module.exports = {
       latitude: {
         type: Sequelize.STRING(45),
       },
-      user_iduser: {
+      id_user_iduser: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Users', 

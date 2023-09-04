@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: {
           model: 'Products',
-          key: 'idproduct', 
+          key: 'id', 
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
@@ -20,7 +20,7 @@ module.exports = {
       id_branch: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Branch', 
+          model: 'Branches', 
           key: 'id', 
         },
         onUpdate: 'CASCADE',
@@ -31,9 +31,7 @@ module.exports = {
       },
       discount_percent: {
         type: Sequelize.INTEGER,
-      },
-      discount_num: {
-        type: Sequelize.INTEGER,
+        defaultValue: '0', 
       },
       id_stock_promo: {
         type: Sequelize.INTEGER,
