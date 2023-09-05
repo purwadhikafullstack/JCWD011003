@@ -14,10 +14,10 @@ module.exports = {
       details: {
         type: Sequelize.STRING(45),
       },
-      discount_percent: {
+      discountPercent: {
         type: Sequelize.INTEGER,
       },
-      daysValid: {
+      timeValid: {
         type: Sequelize.INTEGER,
       },
     });

@@ -15,14 +15,15 @@ module.exports = {
           model: 'Users', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
-      total_price: {
+      totPrice: {
         type: Sequelize.INTEGER,
       },
-      total_qty: {
+      totQty: {
         type: Sequelize.INTEGER,
+      },
+      totWeight: {
+        type: Sequelize.FLOAT,
       },
     });
   },

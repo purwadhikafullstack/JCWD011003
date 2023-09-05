@@ -14,13 +14,11 @@ module.exports = {
           model: 'Stocks', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
-      change_qty: {
+      changeQty: {
         type: Sequelize.INTEGER,
       },
-      total_qty: {
+      totalQty: {
         type: Sequelize.INTEGER,
       },
       id_transaction: {
@@ -29,8 +27,6 @@ module.exports = {
           model: 'Transactions', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       details: {
         type: Sequelize.STRING(45),

@@ -8,15 +8,18 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      promo_name: {
-        type: Sequelize.STRING(45),
+      promoName: {
+        type: Sequelize.STRING,
       },
-      buy_qty: {
+      buyQty: {
         type: Sequelize.INTEGER,
       },
-      get_qty: {
+      getQty: {
         type: Sequelize.INTEGER,
       },
+      isActive: {
+        type: Sequelize.BOOLEAN
+      }
     });
   },
 

@@ -8,27 +8,37 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      user_address: {
-        type: Sequelize.STRING(45),
+      userAddress: {
+        type: Sequelize.STRING,
+      },
+      userCity: {
+        type: Sequelize.STRING,
+      },
+      userProvince: {
+        type: Sequelize.STRING,
       },
       longitude: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       latitude: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
-      id_user_iduser: {
+      id_user: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Users', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       isMain: {
         type: Sequelize.BOOLEAN
-      }
+      },
+      isSelected: {
+        type: Sequelize.BOOLEAN
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN
+      },
     });
   },
 

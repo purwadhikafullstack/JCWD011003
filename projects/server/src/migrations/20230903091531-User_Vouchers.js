@@ -14,8 +14,6 @@ module.exports = {
           model: 'Vouchers', 
           key: 'id',
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       id_user: {
         type: Sequelize.INTEGER,
@@ -23,8 +21,6 @@ module.exports = {
           model: 'Users', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       isUsed: {
         type: Sequelize.BOOLEAN,
@@ -35,8 +31,9 @@ module.exports = {
           model: 'Products', 
           key: 'idproduct', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+      },
+      validUntil: {
+        type: Sequelize.DATE,
       },
     });
   },

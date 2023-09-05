@@ -9,16 +9,22 @@ module.exports = {
         autoIncrement: true,
       },
       name: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       longitude: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       latitude: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
-      address: {
-        type: Sequelize.STRING(45),
+      branchAddress: {
+        type: Sequelize.STRING,
+      },
+      branchCity: {
+        type: Sequelize.STRING,
+      },
+      branchProvince: {
+        type: Sequelize.STRING,
       },
       id_admin: {
         type: Sequelize.INTEGER,
@@ -26,8 +32,6 @@ module.exports = {
           model: 'Admins', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       isActive: {
         type: Sequelize.BOOLEAN

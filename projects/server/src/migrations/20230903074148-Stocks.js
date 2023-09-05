@@ -14,8 +14,6 @@ module.exports = {
           model: 'Products',
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       id_branch: {
         type: Sequelize.INTEGER,
@@ -23,13 +21,11 @@ module.exports = {
           model: 'Branches', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       qty: {
         type: Sequelize.INTEGER,
       },
-      discount_percent: {
+      discountPercent: {
         type: Sequelize.INTEGER,
         defaultValue: '0', 
       },
@@ -39,9 +35,10 @@ module.exports = {
           model: 'Stock_Promos', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
+      isActive: {
+        type: Sequelize.BOOLEAN
+      }
     });
   },
 

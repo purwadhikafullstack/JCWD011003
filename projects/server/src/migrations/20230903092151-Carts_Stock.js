@@ -14,8 +14,6 @@ module.exports = {
           model: 'Carts', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       id_stock: {
         type: Sequelize.INTEGER,
@@ -23,13 +21,14 @@ module.exports = {
           model: 'Stocks', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       price: {
         type: Sequelize.INTEGER,
       },
       qty: {
+        type: Sequelize.INTEGER,
+      },
+      weight: {
         type: Sequelize.INTEGER,
       },
     });

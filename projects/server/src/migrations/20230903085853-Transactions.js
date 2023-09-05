@@ -14,8 +14,6 @@ module.exports = {
           model: 'Users', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       id_user_address: {
         type: Sequelize.INTEGER,
@@ -24,11 +22,14 @@ module.exports = {
           key: 'id', 
         },
       },
-      tot_price: {
+      totPrice: {
         type: Sequelize.FLOAT,
       },
-      tot_qty: {
+      totQty: {
         type: Sequelize.INTEGER,
+      },
+      totWeight: {
+        type: Sequelize.FLOAT,
       },
       id_status: {
         type: Sequelize.INTEGER,
@@ -36,10 +37,11 @@ module.exports = {
           model: 'Transaction_Status', 
           key: 'id', 
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
-      shipping: {
+      shipper: {
+        type: Sequelize.STRING,
+      },
+      shippingCost: {
         type: Sequelize.INTEGER,
       },
     });

@@ -3,19 +3,16 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Admins', {
-      idadmin: {
+      id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      name: {
-        type: Sequelize.STRING(45),
-      },
       email: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       password: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       adminSuper: {
         type: Sequelize.BOOLEAN,

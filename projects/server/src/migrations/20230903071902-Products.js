@@ -9,16 +9,16 @@ module.exports = {
         autoIncrement: true,
       },
       name: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       price: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
-      product_img: {
-        type: Sequelize.STRING(45),
+      productImg: {
+        type: Sequelize.STRING,
       },
       description: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       id_category: {
         type: Sequelize.INTEGER,
@@ -26,8 +26,9 @@ module.exports = {
           model: 'Product_Categories', 
           key: 'id',
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+      },
+      weight: {
+        type: Sequelize.INTEGER,
       },
       isActive: {
         type: Sequelize.BOOLEAN

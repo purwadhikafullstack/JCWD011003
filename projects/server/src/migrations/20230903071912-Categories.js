@@ -8,9 +8,12 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      category_name: {
-        type: Sequelize.STRING(45),
+      category: {
+        type: Sequelize.STRING,
       },
+      isActive: {
+        type: Sequelize.BOOLEAN
+      }
     });
   },
 

@@ -9,29 +9,32 @@ module.exports = {
         autoIncrement: true,
       },
       name: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       email: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       gender: {
         type: Sequelize.BOOLEAN,
       },
       avatar: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       referral: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       password: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
       },
       birthday: {
         type: Sequelize.DATE,
       },
       referred_by: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.STRING,
         defaultValue: '0', 
+      },
+      isVerified: {
+        type: Sequelize.BOOLEAN,
       },
       isActive: {
         type: Sequelize.BOOLEAN,
