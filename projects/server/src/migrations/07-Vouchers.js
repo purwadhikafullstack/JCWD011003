@@ -2,28 +2,28 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Admins', {
+    await queryInterface.createTable('Vouchers', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      email: {
+      name: {
         type: Sequelize.STRING,
       },
-      password: {
+      details: {
         type: Sequelize.STRING,
       },
-      adminSuper: {
-        type: Sequelize.BOOLEAN,
+      discountPercent: {
+        type: Sequelize.INTEGER,
       },
-      isActive: {
-        type: Sequelize.BOOLEAN,
+      timeValid: {
+        type: Sequelize.INTEGER,
       },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Admins');
+    await queryInterface.dropTable('Vouchers');
   },
 };

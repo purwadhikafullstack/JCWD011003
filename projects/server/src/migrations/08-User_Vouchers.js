@@ -2,39 +2,43 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Stock_History', {
+    await queryInterface.createTable('User_Vouchers', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      id_stock: {
+      id_voucher: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Stocks', 
+          model: 'Vouchers', 
+          key: 'id',
+        },
+      },
+      id_user: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users', 
           key: 'id', 
         },
       },
-      changeQty: {
-        type: Sequelize.INTEGER,
+      isUsed: {
+        type: Sequelize.BOOLEAN,
       },
-      totalQty: {
-        type: Sequelize.INTEGER,
-      },
-      id_transaction: {
+      id_product: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Transactions', 
+          model: 'Products', 
           key: 'id', 
         },
       },
-      details: {
-        type: Sequelize.STRING(45),
+      validUntil: {
+        type: Sequelize.DATE,
       },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Stock_History');
+    await queryInterface.dropTable('User_Vouchers');
   },
 };

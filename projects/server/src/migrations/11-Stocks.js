@@ -27,7 +27,7 @@ module.exports = {
       },
       discountPercent: {
         type: Sequelize.INTEGER,
-        defaultValue: '0', 
+        defaultValue: 0, 
       },
       id_stock_promo: {
         type: Sequelize.INTEGER,
@@ -37,7 +37,8 @@ module.exports = {
         },
       },
       isActive: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: true, 
       }
     });
   },

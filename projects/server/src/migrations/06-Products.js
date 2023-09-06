@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Products', {
-      idproduct: {
+      id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -23,7 +23,7 @@ module.exports = {
       id_category: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Product_Categories', 
+          model: 'Categories', 
           key: 'id',
         },
       },
@@ -31,7 +31,8 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       isActive: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: true, 
       }
     });
   },

@@ -41,8 +41,17 @@ module.exports = {
       shipper: {
         type: Sequelize.STRING,
       },
+      shippingMethod: {
+        type: Sequelize.STRING,
+      },
       shippingCost: {
         type: Sequelize.INTEGER,
+      },
+      arrivalEstEarly: {
+        type: Sequelize.DATE,
+      },
+      arrivalEstLate: {
+        type: Sequelize.DATE,
       },
     });
   },

@@ -2,28 +2,30 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Stock_Promos', {
+    await queryInterface.createTable('Admins', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      promoName: {
+      email: {
         type: Sequelize.STRING,
       },
-      buyQty: {
-        type: Sequelize.INTEGER,
+      password: {
+        type: Sequelize.STRING,
       },
-      getQty: {
-        type: Sequelize.INTEGER,
+      adminSuper: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false, 
       },
       isActive: {
-        type: Sequelize.BOOLEAN
-      }
+        type: Sequelize.BOOLEAN,
+        defaultValue: true, 
+      },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Stock_Promos');
+    await queryInterface.dropTable('Admins');
   },
 };

@@ -2,13 +2,19 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Branches', {
+    await queryInterface.createTable('User_Address', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      name: {
+      userAddress: {
+        type: Sequelize.STRING,
+      },
+      userCity: {
+        type: Sequelize.STRING,
+      },
+      userProvince: {
         type: Sequelize.STRING,
       },
       longitude: {
@@ -17,29 +23,29 @@ module.exports = {
       latitude: {
         type: Sequelize.STRING,
       },
-      branchAddress: {
-        type: Sequelize.STRING,
-      },
-      branchCity: {
-        type: Sequelize.STRING,
-      },
-      branchProvince: {
-        type: Sequelize.STRING,
-      },
-      id_admin: {
+      id_user: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Admins', 
+          model: 'Users', 
           key: 'id', 
         },
       },
+      isMain: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false, 
+      },
+      isSelected: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false, 
+      },
       isActive: {
-        type: Sequelize.BOOLEAN
-      }
+        type: Sequelize.BOOLEAN,
+        defaultValue: true, 
+      },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Branches');
+    await queryInterface.dropTable('User_Address');
   },
 };

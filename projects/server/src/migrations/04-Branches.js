@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Branches', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -11,38 +11,36 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
       },
-      email: {
+      longitude: {
         type: Sequelize.STRING,
       },
-      gender: {
-        type: Sequelize.BOOLEAN,
-      },
-      avatar: {
+      latitude: {
         type: Sequelize.STRING,
       },
-      referral: {
+      branchAddress: {
         type: Sequelize.STRING,
       },
-      password: {
+      branchCity: {
         type: Sequelize.STRING,
       },
-      birthday: {
-        type: Sequelize.DATE,
-      },
-      referred_by: {
+      branchProvince: {
         type: Sequelize.STRING,
-        defaultValue: '0', 
       },
-      isVerified: {
-        type: Sequelize.BOOLEAN,
+      id_admin: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Admins', 
+          key: 'id', 
+        },
       },
       isActive: {
         type: Sequelize.BOOLEAN,
-      },
+        defaultValue: true, 
+      }
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Branches');
   },
 };
