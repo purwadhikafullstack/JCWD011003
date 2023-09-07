@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
     userAddress: DataTypes.STRING,
     userCity: DataTypes.STRING,
     userProvince: DataTypes.STRING,
-    longitude: DataTypes.STRING,
-    latitude: DataTypes.STRING,
+    longitude: DataTypes.DOUBLE,
+    latitude: DataTypes.DOUBLE,
     id_user: DataTypes.INTEGER,
     isMain: {
       type: DataTypes.BOOLEAN,
