@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'UserVoucher',
+      modelName: 'User_Voucher',
       createdAt: 'createdAt',
       updatedAt: 'updatedAt',
       timestamps: true,
