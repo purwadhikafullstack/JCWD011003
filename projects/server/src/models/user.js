@@ -1,18 +1,15 @@
 'use strict';
 const { Model } = require('sequelize');
-
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       // define association here
+      User.hasMany(models.User_Address, { foreignKey: 'id_user' });
+      User.hasMany(models.User_Voucher, { foreignKey: 'id_user' });
+      User.hasMany(models.Transaction, { foreignKey: 'id_user' });
+      User.hasOne(models.Cart, { foreignKey: 'id_user' });
     }
-  }
-
+  };
   User.init({
     name: DataTypes.STRING,
     email: DataTypes.STRING,
@@ -21,14 +18,20 @@ module.exports = (sequelize, DataTypes) => {
     referral: DataTypes.STRING,
     password: DataTypes.STRING,
     birthday: DataTypes.DATE,
-    referred_by: DataTypes.STRING,
+    referred_by: {
+      type: DataTypes.STRING,
+      defaultValue: '0', 
+    },
     isVerified: DataTypes.BOOLEAN,
-    isActive: DataTypes.BOOLEAN
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true, 
+    },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
-    sequelize, // Pass the Sequelize instance here
+    sequelize,
     modelName: 'User',
-    timestamps: true, // This enables the createdAt and updatedAt columns
   });
-
   return User;
 };
