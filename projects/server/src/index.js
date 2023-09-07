@@ -17,6 +17,7 @@ app.use(
 app.use(express.json());
 const db = require('./models')
 // db.sequelize.sync({alter: true})
+
 app.use('/api', apiRouter)
 const {authRouter} = require('./router')
 //#region API ROUTES
