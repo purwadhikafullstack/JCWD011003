@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   Branch.init({
     name: DataTypes.STRING,
-    longitude: DataTypes.STRING,
-    latitude: DataTypes.STRING,
+    longitude: DataTypes.DOUBLE,
+    latitude: DataTypes.DOUBLE,
     branchAddress: DataTypes.STRING,
     branchCity: DataTypes.STRING,
     branchProvince: DataTypes.STRING,
