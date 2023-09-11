@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Admin.hasMany(models.Branch, { foreignKey: 'id_admin' });
-      // Admin.belongsTo(models.Branch, { foreignKey: 'id_admin' });
+      // Admin.belongsTo(models.Branch, { foreignKey: 'id_branch' });
     }
   };
   Admin.init({
@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true, 
     },
+    // id_branch: DataTypes.INTEGER,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   }, {
