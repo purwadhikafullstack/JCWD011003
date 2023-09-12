@@ -1,29 +1,29 @@
 const db = require('../models')
 const Transaction = db.Transaction;
-const TP = db.Transaction_Product;
-const Product = db.Products;
+const TP = db.Transaction_Stock;
+const Stock = db.Stocks;
 const Category = db.Category;
 const Cart = db.Cart;
-const Cart_Product = db.Cart_Product;
+const Cart_Stock = db.Cart_Stock;
 const { Op } = require("sequelize");
 
 const updateCart = async (req, res) => {
-    const { cartId, productId, quantity } = req.body;
+    const { cartId, StockId, quantity } = req.body;
   
     try {
       await db.sequelize.transaction(async (t) => {
        
-          const existingItem = await Cart_Product.findOne({ where: { cartId, productId } }, { transaction: t });
+          const existingItem = await Cart_Stock.findOne({ where: { cartId, StockId } }, { transaction: t });
   
           if (existingItem) {
             existingItem.quantity = quantity;
             await existingItem.save({ transaction: t });
             res.status(200).json({ message: 'Item updated successfully', item: existingItem });
           } else {
-            const newItem = await Cart_Product.create(
+            const newItem = await Cart_Stock.create(
               {
                 cartId,
-                productId,
+                StockId,
                 quantity,
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -41,7 +41,7 @@ const updateCart = async (req, res) => {
     }
   };
 
-  async function transactionCashier (req, res) {
+  async function transactionUser (req, res) {
     try {
         const { id } = req.params;
         const transaction = await Transaction.findByPk(id, {
@@ -53,7 +53,7 @@ const updateCart = async (req, res) => {
               model: TP,
               include: [
                 {
-                  model: Product
+                  model: Stock
                 }
               ],
             }
@@ -79,7 +79,7 @@ async function resetCart(req, res) {
         await Cart.update(
           {
             totalPrice: 0,
-            totalItem: 0,
+            totalQty: 0,
           },
           {
             where: { id: id },
@@ -87,7 +87,7 @@ async function resetCart(req, res) {
           }
         );
   
-        await Cart_Product.destroy({
+        await Cart_Stock.destroy({
           where: { cartId: id },
           transaction: t,
         });
@@ -128,31 +128,31 @@ const getPaginationParams = (req) => {
     return { page, limit, offset };
 };
 
-const buildProductFilter = (req) => {
-    const { id_category, productName } = req.query;
+const buildStockFilter = (req) => {
+    const { id_category, StockName } = req.query;
     const where = { isActive: true };
     if (id_category) {
         where.categoryId = id_category; 
     }
-    if (productName) {
-        where.productName = { [Op.like]: `%${productName}%` };
+    if (StockName) {
+        where.StockName = { [Op.like]: `%${StockName}%` };
     }
     return where;
 };
 
-const getProductSortOrder = (req) => {
+const getStockSortOrder = (req) => {
     const sort = req.query.sort || 'desc';
     const field = req.query.field || 'createdAt'; // default sort field
     return sort === 'asc' ? [[field, 'ASC']] : [[field, 'DESC']];
 };
 
-const getProductsAndInclude = async (where, order, offset, limit) => {
+const getStocksAndInclude = async (where, order, offset, limit) => {
     const includeOptions = [
         { model: Category },
     ];
     where.isActive = true;
 
-    return await Product.findAll({
+    return await Stock.findAll({
         where,
         order,
         offset,
@@ -161,15 +161,15 @@ const getProductsAndInclude = async (where, order, offset, limit) => {
     });
 };
 
-async function getProduct(req, res){
+async function getStock(req, res){
     try {
         console.log(req.query)
         const { page, limit, offset } = getPaginationParams(req);
-        const where = buildProductFilter(req);
-        const order = getProductSortOrder(req);
+        const where = buildStockFilter(req);
+        const order = getStockSortOrder(req);
   
-        const totalProducts = await Product.count({ where });
-        const totalPages = Math.ceil(totalProducts / limit);
+        const totalStocks = await Stock.count({ where });
+        const totalPages = Math.ceil(totalStocks / limit);
 
         const size = (function() {
             if (totalPages > limit) {
@@ -180,20 +180,20 @@ async function getProduct(req, res){
         })();
         console.log(size)
   
-        const products = await getProductsAndInclude(where, order, offset, limit);
+        const Stocks = await getStocksAndInclude(where, order, offset, limit);
   
         return res.status(200).json({
-            message: "Products fetched successfully",
+            message: "Stocks fetched successfully",
             data: {
                 totalPages: totalPages,
                 page: page,
                 pageSize: size,
-                products: products,
+                Stocks: Stocks,
             }
         });
     } catch (err) {
-        return res.status(500).json({ message: 'Fetching products failed' });
+        return res.status(500).json({ message: 'Fetching Stocks failed' });
     }
 }
 
-  module.exports ={getProduct,payment,resetCart, transactionCashier, updateCart }
+  module.exports ={getStock,payment,resetCart, transactionUser, updateCart }
