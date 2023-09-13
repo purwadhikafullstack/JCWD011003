@@ -4,10 +4,8 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Cart_Stock extends Model {
     static associate(models) {
-      // Define associations here
     }
   }
-
   Cart_Stock.init(
     {
       id_cart: {
