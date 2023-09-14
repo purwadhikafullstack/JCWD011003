@@ -8,12 +8,12 @@ const Cart_Stock = db.Cart_Stock;
 const { Op } = require("sequelize");
 
 const updateCart = async (req, res) => {
-    const { cartId, StockId, quantity } = req.body;
+    const { id_cart, id_stock, quantity } = req.body;
   
     try {
       await db.sequelize.transaction(async (t) => {
        
-          const existingItem = await Cart_Stock.findOne({ where: { cartId, StockId } }, { transaction: t });
+          const existingItem = await Cart_Stock.findOne({ where: { id_cart, id_stock } }, { transaction: t });
   
           if (existingItem) {
             existingItem.quantity = quantity;
@@ -22,8 +22,8 @@ const updateCart = async (req, res) => {
           } else {
             const newItem = await Cart_Stock.create(
               {
-                cartId,
-                StockId,
+                id_cart,
+                id_stock,
                 quantity,
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -78,8 +78,8 @@ async function resetCart(req, res) {
       await db.sequelize.transaction(async (t) => {
         await Cart.update(
           {
-            totalPrice: 0,
-            totalQty: 0,
+            totPrice: 0,
+            totQty: 0,
           },
           {
             where: { id: id },
@@ -88,7 +88,7 @@ async function resetCart(req, res) {
         );
   
         await Cart_Stock.destroy({
-          where: { cartId: id },
+          where: { id_cart: id },
           transaction: t,
         });
       });
@@ -142,7 +142,7 @@ const buildStockFilter = (req) => {
 
 const getStockSortOrder = (req) => {
     const sort = req.query.sort || 'desc';
-    const field = req.query.field || 'createdAt'; // default sort field
+    const field = req.query.field || 'createdAt'; 
     return sort === 'asc' ? [[field, 'ASC']] : [[field, 'DESC']];
 };
 
@@ -196,4 +196,112 @@ async function getStock(req, res){
     }
 }
 
-  module.exports ={getStock,payment,resetCart, transactionUser, updateCart }
+async function getCart(req, res) {
+  const { id_cart } = req.params;
+
+  try {
+    const cart = await Cart.findByPk(id_cart);
+
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart not found' });
+    }
+
+    res.json(cart);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while fetching the cart' });
+  }
+};
+async function getCartItems (req,res) {
+  try {
+      const cartItems = await Cart_Stock.findAll({
+        include: [Cart, Stock] // Include both Cart and Stock models in the query
+      });
+      // console.log(cartItems)
+      res.status(200).json(cartItems);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'An error occurred while fetching cart items' });
+    }
+};
+
+async function cartTotal() {
+  try {
+    const carts = await Cart.findAll({
+      attributes: ["id", "userId", "totalPrice", "totalItem", [sequelize.fn('SUM', sequelize.col('Cart_Stock.qty')), 'totQty']],
+      include: [{
+        model: Cart_Stock,
+        attributes: []
+      }],
+      group: ["Cart.id"]
+    });
+
+    console.log(carts);
+  } catch (error) {
+    console.error("Error fetching carts:", error);
+  }
+}
+
+async function createTransaction(req, res) {
+  try {
+      await db.sequelize.transaction(async (t) => {
+          const cartItemsObject = req.body;
+          const cartItems = cartItemsObject.cartItems; 
+
+          let totalItem = 0;
+          let totalPrice = 0;
+
+          for (const item of cartItems) {
+              totalItem += item.quantity;
+              totalPrice += item.quantity * item.Stock.StockPrice;
+          }
+          const transaction = await Transaction.create(
+              {
+                  userId: cartItems[0].Cart.userId,
+                  totalPrice: totalPrice,
+                  totalItem: totalItem,
+                 
+              },
+              { transaction: t } 
+          );
+          for (const item of cartItems) {
+              await TP.create(
+                  {
+                      transactionId: transaction.id,
+                      id_stock: item.Stock.id,
+                      StockPrice: item.Stock.StockPrice,
+                      quantity: item.quantity,
+                  },
+                  { transaction: t } 
+              );
+          }
+          res.status(201).json({ message: 'Cart items sent successfully', data: transaction.id });
+      });
+
+  } catch (error) {
+      console.error('Error sending cart:', error);
+      res.status(500).json({ error: 'An error occurred' });
+  }
+};
+async function deleteCartItems (req,res) {
+  const { id_cart, id_stock } = req.body;
+
+  try {
+    await db.sequelize.transaction(async (t) => {
+      const existingItem = await Cart_Stock.findOne({ where: { id_cart, id_stock } });
+
+      if (existingItem) {
+        await existingItem.destroy({ transaction: t });
+
+        return res.status(200).json({ message: 'Item deleted from cart successfully' });
+      } else {
+        return res.status(404).json({ message: 'Item not found in cart' });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'An error occurred while deleting the item from cart' });
+  }
+};
+
+  module.exports ={getStock,payment,resetCart, transactionUser, updateCart, createTransaction, deleteCartItems, getCartItems, getCart }
