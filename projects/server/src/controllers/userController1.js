@@ -1,45 +1,87 @@
 const db = require('../models')
+const { Op } = require("sequelize");
 const Transaction = db.Transaction;
 const TP = db.Transaction_Stock;
-const Stock = db.Stocks;
+const Product = db.Product;
 const Category = db.Category;
+const Stock = db.Stock;
 const Cart = db.Cart;
 const Cart_Stock = db.Cart_Stock;
-const { Op } = require("sequelize");
 
-const updateCart = async (req, res) => {
-    const { id_cart, id_stock, quantity } = req.body;
-  
-    try {
-      await db.sequelize.transaction(async (t) => {
-       
-          const existingItem = await Cart_Stock.findOne({ where: { id_cart, id_stock } }, { transaction: t });
-  
-          if (existingItem) {
-            existingItem.quantity = quantity;
-            await existingItem.save({ transaction: t });
-            res.status(200).json({ message: 'Item updated successfully', item: existingItem });
-          } else {
-            const newItem = await Cart_Stock.create(
-              {
-                id_cart,
-                id_stock,
-                quantity,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              },
-              { transaction: t }
-            );
-  
-            res.status(201).json({ message: 'Item added to cart successfully', item: newItem });
-          }
-        
+async function updateCart(req, res) {
+  try {
+    const { stockId, quantity } = req.body;
+    const { cartId } = req.user;
+
+    await db.sequelize.transaction(async (t) => {
+      const stockItem = await Stock.findByPk(stockId, {
+        include: Product,
+        transaction: t,
       });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'An error occurred while updating the cart' });
-    }
-  };
+
+      if (!stockItem) {
+        throw new Error('Stock item not found');
+      }
+
+      const weight = stockItem.Product.weight * quantity;
+      const price = stockItem.Product.price * quantity;
+
+      // Check if a record with the same stockId and cartId exists
+      const [cartStockItem, created] = await Cart_Stock.findOrCreate({
+        where: { id_stock: stockItem.id, id_cart: cartId },
+        defaults: {
+          price: price,
+          qty: quantity,
+          weight: weight,
+        },
+        transaction: t,
+      });
+
+      if (!created) {
+        // If not created, update the existing record
+        await Cart_Stock.update(
+          {
+            price: price,
+            qty: quantity,
+            weight: weight,
+          },
+          {
+            where: { id_stock: stockItem.id, id_cart: cartId },
+            transaction: t,
+          }
+        );
+      }
+
+      // Calculate and update Cart totals based on Cart_Stock changes
+      const cartStockItems = await Cart_Stock.findAll({
+        where: { id_cart: cartId },
+        transaction: t,
+      });
+
+      const totPrice = cartStockItems.reduce((total, item) => total + item.price, 0);
+      const totQty = cartStockItems.reduce((total, item) => total + item.qty, 0);
+      const totWeight = cartStockItems.reduce((total, item) => total + item.weight, 0);
+
+      // Update the Cart with the new totals
+      await Cart.update(
+        {
+          totPrice: totPrice,
+          totQty: totQty,
+          totWeight: totWeight,
+        },
+        {
+          where: { id: cartId },
+          transaction: t,
+        }
+      );
+
+      res.status(201).json(cartStockItem);
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
 
   async function transactionUser (req, res) {
     try {
@@ -74,21 +116,22 @@ const updateCart = async (req, res) => {
 
 async function resetCart(req, res) {
     try {
-      const { id } = req.params;
+      const { cartId } = req.user;
       await db.sequelize.transaction(async (t) => {
         await Cart.update(
           {
             totPrice: 0,
             totQty: 0,
+            totWeight: 0,
           },
           {
-            where: { id: id },
+            where: { id: cartId },
             transaction: t,
           }
         );
   
         await Cart_Stock.destroy({
-          where: { id_cart: id },
+          where: { id_cart: cartId },
           transaction: t,
         });
       });
@@ -197,10 +240,9 @@ async function getStock(req, res){
 }
 
 async function getCart(req, res) {
-  const { id_cart } = req.params;
-
   try {
-    const cart = await Cart.findByPk(id_cart);
+    const { cartId } = req.user;
+    const cart = await Cart.findByPk(cartId);
 
     if (!cart) {
       return res.status(404).json({ message: 'Cart not found' });
@@ -212,18 +254,27 @@ async function getCart(req, res) {
     res.status(500).json({ message: 'An error occurred while fetching the cart' });
   }
 };
-async function getCartItems (req,res) {
+async function getCartItems(req, res) {
   try {
-      const cartItems = await Cart_Stock.findAll({
-        include: [Cart, Stock] // Include both Cart and Stock models in the query
-      });
-      // console.log(cartItems)
-      res.status(200).json(cartItems);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'An error occurred while fetching cart items' });
+    const { cartId } = req.user;
+
+    if (!cartId) {
+      // Handle the case where cartId is missing or invalid
+      return res.status(400).json({ message: 'Invalid cartId' });
     }
-};
+
+    const cartItems = await Cart_Stock.findAll({
+      where: { id_cart: cartId },
+      // include: [Cart, Stock], problem with association
+    });
+
+    res.status(200).json(cartItems);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while fetching cart items', error: error.message });
+  }
+}
+
 
 async function cartTotal() {
   try {
@@ -252,8 +303,8 @@ async function createTransaction(req, res) {
           let totalPrice = 0;
 
           for (const item of cartItems) {
-              totalItem += item.quantity;
-              totalPrice += item.quantity * item.Stock.StockPrice;
+              totalItem += item.qty;
+              totalPrice += item.qty * item.Stock.StockPrice;
           }
           const transaction = await Transaction.create(
               {
@@ -270,7 +321,7 @@ async function createTransaction(req, res) {
                       transactionId: transaction.id,
                       id_stock: item.Stock.id,
                       StockPrice: item.Stock.StockPrice,
-                      quantity: item.quantity,
+                      qty: item.qty,
                   },
                   { transaction: t } 
               );

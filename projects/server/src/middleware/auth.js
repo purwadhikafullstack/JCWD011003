@@ -17,6 +17,7 @@ const verifyUser = (req, res, next) => {
     if (!verifiedUser) return res.status(401).send("Unauthorized request");
 
     req.user = verifiedUser;
+    console.log(req.user, 'aaa')
     next();
   } catch (error) {
     return res.status(400).send("Invalid Token/Token Expired");

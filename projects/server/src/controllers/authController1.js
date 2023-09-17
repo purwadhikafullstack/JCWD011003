@@ -2,16 +2,24 @@ const path = require("path");
 require("dotenv").config({
   path: path.resolve("../.env"),
 });
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const db = require("../models");
 const users = db.User;
 const carts = db.Cart;
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 
  async function userLogin (req, res)  {
     try {
       const { username, password } = req.body;
-      const userData = await users.findOne({ where: { username: username } });
+      const userData = await users.findOne({ 
+        where: { name: username },
+        include: [{
+          model: carts,
+          attributes: ['id'], 
+        }],
+      });
+  console.log(userData)
+  const cartId = userData.Cart.id;
   
       if (!userData) {
         return res.status(404).json({
@@ -31,11 +39,10 @@ const bcrypt = require("bcrypt");
   
       let payload = {
         id: userData.id,
+        cartId: cartId
       };
   
-      const token = jwt.sign(payload, process.env.JWT_KEY, {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(payload, process.env.JWT_KEY);
   
      
         return res.status(200).json({
@@ -43,6 +50,7 @@ const bcrypt = require("bcrypt");
           data: {
             id: userData.id,
             username: userData.username,
+            cart: cartId,
             token,
           },
         })

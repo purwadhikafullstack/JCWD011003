@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       id_user_address: DataTypes.INTEGER,
       totPrice: DataTypes.FLOAT,
       totQty: DataTypes.INTEGER,
-      totWeight: DataTypes.FLOAT,
+      totWeight: DataTypes.INTEGER,
       id_status: {
         type: DataTypes.INTEGER,
         defaultValue: 1, 
