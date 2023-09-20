@@ -24,9 +24,7 @@ module.exports = {
       {
         id_voucher: 1, // Voucher ID (adjust according to your actual voucher data)
         id_user: 2,    // User ID for the second user
-        isUsed: false,  // Voucher used
-        id_product: 2, // Product ID (adjust according to your actual product data)
-        validUntil: new Date('2023-11-15'), // Valid until November 15, 2023
+        isUsed: false,  // Voucher used        validUntil: new Date('2023-11-15'), // Valid until November 15, 2023
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -34,7 +32,7 @@ module.exports = {
         id_voucher: 2, // Voucher ID (adjust according to your actual voucher data)
         id_user: 2,    // User ID for the second user
         isUsed: false,  // Voucher used
-        id_product: 2, // Product ID (adjust according to your actual product data)
+
         validUntil: new Date('2023-11-15'), // Valid until November 15, 2023
         createdAt: new Date(),
         updatedAt: new Date(),

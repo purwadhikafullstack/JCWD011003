@@ -259,13 +259,23 @@ async function getCartItems(req, res) {
     const { cartId } = req.user;
 
     if (!cartId) {
-      // Handle the case where cartId is missing or invalid
       return res.status(400).json({ message: 'Invalid cartId' });
     }
 
     const cartItems = await Cart_Stock.findAll({
       where: { id_cart: cartId },
-      // include: [Cart, Stock], problem with association
+      include: [
+        {
+          model: Stock,
+          include: [
+            {
+              model: Product, // Include the Product model
+              attributes: ['name', 'price', 'productImg'], // Select specific attributes from Product
+            },
+          ],
+        },
+        Cart,
+      ],
     });
 
     res.status(200).json(cartItems);
