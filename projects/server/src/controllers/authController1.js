@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const db = require("../models");
 const users = db.User;
+const admins = db.Admin;
 const carts = db.Cart;
 
  async function userLogin (req, res)  {
@@ -18,7 +19,61 @@ const carts = db.Cart;
           attributes: ['id'], 
         }],
       });
-  console.log(userData)
+  const cartId = userData.Cart.id;
+  
+      if (!userData) {
+        return res.status(404).json({
+          error: "Login failed",
+          message: "User not found",
+        });
+      }
+
+      const validatePassword = await bcrypt.compare(password, userData.password);
+  
+      if (!validatePassword) {
+        return res.status(400).json({
+          error: "Login failed",
+          message: "Invalid password",
+        });
+      }
+  
+      let payload = {
+        id: userData.id,
+        cartId: cartId
+      };
+  
+      const token = jwt.sign(payload, process.env.JWT_KEY);
+  
+     
+        return res.status(200).json({
+          success: "Login succeed",
+          data: {
+            id: userData.id,
+            username: userData.username,
+            cart: cartId,
+            token,
+          },
+        })
+      
+    } catch (err) {
+        console.error(err)
+      return res.status(500).json({
+        error: "Login failed",
+        message: err.message,
+      });
+    }
+  }
+
+  async function adminLogin (req, res)  {
+    try {
+      const { username, password } = req.body;
+      const userData = await users.findOne({ 
+        where: { name: username },
+        include: [{
+          model: carts,
+          attributes: ['id'], 
+        }],
+      });
   const cartId = userData.Cart.id;
   
       if (!userData) {

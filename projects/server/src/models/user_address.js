@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       User_Address.hasMany(models.Transaction, { foreignKey: 'id_user_address' });
     }
   };
+
   User_Address.init({
     userName: DataTypes.STRING,
     userAddress: DataTypes.STRING,

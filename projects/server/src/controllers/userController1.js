@@ -13,7 +13,7 @@ async function updateCart(req, res) {
     const { stockId, quantity } = req.body;
     const { cartId } = req.user;
 
-    await db.sequelize.transaction(async (t) => {
+    const cartStockItem = await db.sequelize.transaction(async (t) => {
       const stockItem = await Stock.findByPk(stockId, {
         include: Product,
         transaction: t,
@@ -24,13 +24,16 @@ async function updateCart(req, res) {
       }
 
       const weight = stockItem.Product.weight * quantity;
-      const price = stockItem.Product.price * quantity;
+      
+      // Calculate the price with discount
+      const discountPercentage = stockItem.discountPercent || 0; // Default to 0 if no discount
+      const originalPrice = stockItem.Product.price * quantity;
+      const discountedPrice = originalPrice - (originalPrice * (discountPercentage / 100));
 
-      // Check if a record with the same stockId and cartId exists
       const [cartStockItem, created] = await Cart_Stock.findOrCreate({
         where: { id_stock: stockItem.id, id_cart: cartId },
         defaults: {
-          price: price,
+          price: discountedPrice,
           qty: quantity,
           weight: weight,
         },
@@ -38,10 +41,9 @@ async function updateCart(req, res) {
       });
 
       if (!created) {
-        // If not created, update the existing record
         await Cart_Stock.update(
           {
-            price: price,
+            price: discountedPrice,
             qty: quantity,
             weight: weight,
           },
@@ -52,7 +54,6 @@ async function updateCart(req, res) {
         );
       }
 
-      // Calculate and update Cart totals based on Cart_Stock changes
       const cartStockItems = await Cart_Stock.findAll({
         where: { id_cart: cartId },
         transaction: t,
@@ -62,7 +63,6 @@ async function updateCart(req, res) {
       const totQty = cartStockItems.reduce((total, item) => total + item.qty, 0);
       const totWeight = cartStockItems.reduce((total, item) => total + item.weight, 0);
 
-      // Update the Cart with the new totals
       await Cart.update(
         {
           totPrice: totPrice,
@@ -75,13 +75,16 @@ async function updateCart(req, res) {
         }
       );
 
-      res.status(201).json(cartStockItem);
+      return cartStockItem; // Return the updated cart item
     });
+
+    res.status(201).json(cartStockItem); // Respond with the updated cart item
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 
   async function transactionUser (req, res) {
     try {
@@ -269,8 +272,8 @@ async function getCartItems(req, res) {
           model: Stock,
           include: [
             {
-              model: Product, // Include the Product model
-              attributes: ['name', 'price', 'productImg'], // Select specific attributes from Product
+              model: Product, 
+              attributes: ['name', 'price', 'productImg'], 
             },
           ],
         },

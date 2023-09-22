@@ -28,8 +28,6 @@ module.exports = (sequelize, DataTypes) => {
       shipper: DataTypes.STRING,
       shippingMethod: DataTypes.STRING,
       shippingCost: DataTypes.INTEGER,
-      // arrivalEstEarly: DataTypes.DATE,
-      // arrivalEstLate: DataTypes.DATE,
       createdAt: {
         type: DataTypes.DATE,
       },
