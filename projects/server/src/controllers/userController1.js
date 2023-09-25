@@ -13,9 +13,13 @@ async function updateCart(req, res) {
     const { stockId, quantity } = req.body;
     const { cartId } = req.user;
 
-    const cartStockItem = await db.sequelize.transaction(async (t) => {
+    await db.sequelize.transaction(async (t) => {
       const stockItem = await Stock.findByPk(stockId, {
-        include: Product,
+        include: {
+          model: Product,
+
+        },
+        attributes: ['id', 'id_stock_promo','discountPercent'], // Include the 'id' column
         transaction: t,
       });
 
@@ -24,16 +28,12 @@ async function updateCart(req, res) {
       }
 
       const weight = stockItem.Product.weight * quantity;
-      
-      // Calculate the price with discount
-      const discountPercentage = stockItem.discountPercent || 0; // Default to 0 if no discount
-      const originalPrice = stockItem.Product.price * quantity;
-      const discountedPrice = originalPrice - (originalPrice * (discountPercentage / 100));
+      const price = stockItem.Product.price * quantity;
 
       const [cartStockItem, created] = await Cart_Stock.findOrCreate({
         where: { id_stock: stockItem.id, id_cart: cartId },
         defaults: {
-          price: discountedPrice,
+          price: price,
           qty: quantity,
           weight: weight,
         },
@@ -43,7 +43,7 @@ async function updateCart(req, res) {
       if (!created) {
         await Cart_Stock.update(
           {
-            price: discountedPrice,
+            price: price,
             qty: quantity,
             weight: weight,
           },
@@ -75,15 +75,18 @@ async function updateCart(req, res) {
         }
       );
 
-      return cartStockItem; // Return the updated cart item
+      res.status(201).json({
+        ...cartStockItem.toJSON(), // Existing data from Cart_Stock
+        discountPercent: stockItem.discountPercent, // Include discountPercent from Product
+        id_stock_promo: stockItem.id_stock_promo,
+      });
     });
-
-    res.status(201).json(cartStockItem); // Respond with the updated cart item
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 
 
   async function transactionUser (req, res) {
