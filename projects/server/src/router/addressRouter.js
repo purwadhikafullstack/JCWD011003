@@ -5,8 +5,8 @@ const { auth } = require("../middleware");
 router.post("/", auth, userAddressControllers.createUserAddress);
 router.get("/", auth, userAddressControllers.getUserAddress)
 router.get("/:id", auth, userAddressControllers.getUserAddressById);
-router.patch("/", auth, userAddressControllers.updateUserAddress);
-router.delete("/", auth, userAddressControllers.deleteUserAddress);
-router.post("/default", userAddressControllers.setDefault);
+router.patch("/:id", auth, userAddressControllers.updateUserAddress);
+router.delete("/:id", auth, userAddressControllers.deleteUserAddress);
+router.patch("/default/:id", auth, userAddressControllers.setDefault);
 
 module.exports = router;

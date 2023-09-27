@@ -110,14 +110,11 @@ export default function PersonalData() {
           showConfirmButton: false,
           timer: 3000,
         });
-  
-        // Mengatur isDataChanged dan tombol menjadi tidak aktif setelah penyimpanan berhasil
         setIsDataChanged((prevIsDataChanged) => ({
           ...prevIsDataChanged,
           [field]: false,
         }));
       }
-      window.location.reload();
     } catch (error) {
       Swal.fire({
         title: 'Please try again😩',

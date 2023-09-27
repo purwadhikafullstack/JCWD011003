@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import jwt_decode from "jwt-decode"
+import React, { useState, useEffect } from "react";
 import {
   Button,
   FormControl,
@@ -15,10 +14,16 @@ import {
   ModalFooter,
   Box,
 } from "@chakra-ui/react";
-import axios from "axios"
+import axios from "axios";
+import Swal from "sweetalert2";
 
-const AddNewAddress = ({ isOpen, onClose }) => {
-  const [formData, setFormData] = useState({
+const AddNewAddress = ({ isOpen, onClose, updateUserData }) => {
+  const [formValid, setFormValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [provinces, setProvinces] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedProvinceId, setSelectedProvinceId] = useState("");
+  const [data, setData] = useState({
     userName: "",
     userProvince: "",
     userCity: "",
@@ -27,91 +32,148 @@ const AddNewAddress = ({ isOpen, onClose }) => {
     latitude: "",
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+  const handleAlertSuccess = () => {
+    // Show success notification
+    Swal.fire({
+      position: 'center-center',
+      icon: 'success',
+      title: "Create New Address successfully😉",
+      showConfirmButton: false,
+      timer: 5000
     });
   };
 
-  const handleSubmit = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("No token found");
-        return;
+  const handleAlertError = () => {
+    // Show error notification
+    Swal.fire({
+      title: 'Error create address😩, Please try again',
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
       }
+    });
+  };
 
-      const data = new FormData();
-      data.append("userName", formData.userName);
-      data.append("userProvince", formData.userProvince);
-      data.append("userCity", formData.userCity);
-      data.append("userAddress", formData.userAddress);
-      data.append("longitude", formData.longitude);
-      data.append("latitude", formData.latitude);
+  useEffect(() => {
+    fetchProvincesAndCities();
+  }, [selectedProvinceId]);
 
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("No token found");
+    return;
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+    const isFormValid = data.userName !== "" && data.userProvince !== "" && data.userCity !== "" && data.userAddress !== "" && data.longitude !== "" && data.latitude !== "";
+    setFormValid(isFormValid);
+  };
+
+  const fetchProvincesAndCities = async () => {
+    try {
+      // Fetch provinces and set them in state
+      const provincesResponse = await axios.get("http://localhost:8000/api/rajaongkir/province");
+      const provincesData = provincesResponse.data.rajaongkir.results;
+      setProvinces(provincesData);
+
+      if (selectedProvinceId) {
+        // Fetch cities for the selected province and set them in state
+        const citiesResponse = await axios.get(`http://localhost:8000/api/rajaongkir/citybyprovince?province=${selectedProvinceId}`);
+        const citiesData = citiesResponse.data.rajaongkir.results;
+        setCities(citiesData);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      // Merge selected province and city into the user's address
+      const getCityName = (cityId) => {
+        const city = cities.find((city) => city.city_id === cityId);
+        return city ? city.city_name : "";
+      };
+
+      const getProvinceName = (provinceId) => {
+        const province = provinces.find((province) => province.province_id === provinceId);
+        return province ? province.province : "";
+      };
+
+      const fullAddress = `${data.userAddress}, ${getCityName(data.userCity)}, ${getProvinceName(data.userProvince)}`;
+
+      // Create a new data object with the merged full address
+      const newData = {
+        ...data,
+        userAddress: fullAddress,
+      };
+
+      // Make the API call with the new data
       const response = await axios.post(
         "http://localhost:8000/api/address",
-        data,
+        newData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      if (response.status === 200) {
-        console.log("Address created successfully");
-        console.log("Response Data:", response.data); 
-        onClose();
-      } else {
-        console.error("Failed to create address");
-        console.log("Response:", response.data);
-      }
+      onClose();
+      handleAlertSuccess();
+      updateUserData(); 
     } catch (error) {
-      console.error("Error creating address:", error);
-      if (error.response) {
-        console.log("Response Status:", error.response.status);
-        console.log("Response Data:", error.response.data);
-      }
+      handleAlertError();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Box>
-      <Modal blockScrollOnMount={false} isCentered isOpen={isOpen} onClose={onClose} size={{ base: "xs", sm: "sm"}}>
+      <Modal blockScrollOnMount={false} isCentered isOpen={isOpen} onClose={onClose} size={{ base: "xs", sm: "sm" }}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader size={{ base: "xs", sm: "sm"}}>Add New Address</ModalHeader>
+          <ModalHeader size={{ base: "xs", sm: "sm" }}>Add New Address</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-          <FormControl colSpan={[6, 3, null, 2]} >
-              <FormLabel htmlFor="userName" size={{ base: "xs", sm: "sm"}}>Label Address</FormLabel>
+            <FormControl colSpan={[6, 3, null, 2]}>
+              <FormLabel htmlFor="userName" size={{ base: "xs", sm: "sm" }}>Label Address</FormLabel>
               <Input
                 type="text"
                 name="userName"
                 id="userName"
                 autoComplete="userName"
-                size={{ base: "xs", sm: "sm"}}
+                size={{ base: "xs", sm: "sm" }}
                 onChange={handleChange}
-                value={formData.userName}
+                value={data.userName}
               />
             </FormControl>
 
-            <FormControl colSpan={[6, 3]} >
-              <FormLabel htmlFor="userProvince" >Province</FormLabel>
+            <FormControl colSpan={[6, 3]}>
+              <FormLabel htmlFor="userProvince">Province</FormLabel>
               <Select
                 id="userProvince"
                 name="userProvince"
                 autoComplete="userProvince"
                 placeholder="Select option"
-                size={{ base: "xs", sm: "sm"}}
-                onChange={handleChange}
-                value={formData.userProvince}
+                size={{ base: "xs", sm: "sm" }}
+                onChange={(e) => {
+                  handleChange(e);
+                  setSelectedProvinceId(e.target.value);
+                }}
+                value={data.userProvince}
               >
-                <option>United States</option>
+                {provinces.map((province) => (
+                  <option key={province.province_id} value={province.province_id}>
+                    {province.province}
+                  </option>
+                ))}
               </Select>
             </FormControl>
 
@@ -122,58 +184,62 @@ const AddNewAddress = ({ isOpen, onClose }) => {
                 name="userCity"
                 autoComplete="userCity"
                 placeholder="Select option"
-                size={{ base: "xs", sm: "sm"}}
+                size={{ base: "xs", sm: "sm" }}
                 onChange={handleChange}
-                value={formData.userCity}
+                value={data.userCity}
               >
-                <option>United States</option>
+                {cities.map((city) => (
+                  <option key={city.city_id} value={city.city_id}>
+                    {city.city_name}
+                  </option>
+                ))}
               </Select>
             </FormControl>
 
-            <FormControl colSpan={[6, 3, null, 2]} >
-              <FormLabel htmlFor="userAddress" size={{ base: "xs", sm: "sm"}}>Street Address</FormLabel>
+            <FormControl colSpan={[6, 3, null, 2]}>
+              <FormLabel htmlFor="userAddress" size={{ base: "xs", sm: "sm" }}>Full Address</FormLabel>
               <Input
                 type="text"
                 name="userAddress"
                 id="userAddress"
                 autoComplete="subdistrict"
-                size={{ base: "xs", sm: "sm"}}
+                size={{ base: "xs", sm: "sm" }}
                 onChange={handleChange}
-                value={formData.userAddress}
+                value={data.userAddress}
               />
             </FormControl>
 
             <FormControl colSpan={6}>
-              <FormLabel htmlFor="longitude" size={{ base: "xs", sm: "sm"}}>Longitude</FormLabel>
+              <FormLabel htmlFor="longitude" size={{ base: "xs", sm: "sm" }}>Longitude</FormLabel>
               <Input
                 type="text"
                 name="longitude"
                 id="longitude"
                 autoComplete="longitude"
-                size={{ base: "xs", sm: "sm"}}
+                size={{ base: "xs", sm: "sm" }}
                 onChange={handleChange}
-                value={formData.longitude}
+                value={data.longitude}
               />
             </FormControl>
 
-            <FormControl colSpan={[6, 3, null, 2]} size={{ base: "xs", sm: "sm"}}>
+            <FormControl colSpan={[6, 3, null, 2]} size={{ base: "xs", sm: "sm" }}>
               <FormLabel htmlFor="latitude">Latitude</FormLabel>
               <Input
                 type="text"
                 name="latitude"
                 id="latitude"
                 autoComplete="latitude"
-                size={{ base: "xs", sm: "sm"}}
+                size={{ base: "xs", sm: "sm" }}
                 onChange={handleChange}
-                value={formData.latitude}
+                value={data.latitude}
               />
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="red" mr={3} onClick={onClose} size={{ base: "xs", sm: "sm"}}>
+            <Button colorScheme="red" mr={3} onClick={onClose} size={{ base: "xs", sm: "sm" }}>
               Close
             </Button>
-            <Button colorScheme="blue" onClick={handleSubmit} size={{ base: "xs", sm: "sm"}}>
+            <Button isLoading={isSubmitting} loadingText="Submitting..." colorScheme="blue" isDisabled={!formValid} onClick={handleSubmit} size={{ base: "xs", sm: "sm" }}>
               Save
             </Button>
           </ModalFooter>

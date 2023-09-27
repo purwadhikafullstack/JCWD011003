@@ -1,6 +1,7 @@
 const db = require("../models");
 const UserAddress = db.User_Address;
 const sequelize = db.sequelize;
+const { Op } = require('sequelize')
 const messages = require("./messages");
 
 
@@ -119,35 +120,37 @@ const updateUserAddress = async (
   }
 };
 
-const setDefault = async (userId, addressId) => {
-    try {
-      const existingAddress = await UserAddress.findOne({
-        where: { id_user: userId },
-      });
-  
-      if (!existingAddress) {
-        return { status: 400, message: "Alamat pengguna tidak ditemukan" };
-      }
-  
-      // Menandai alamat yang dipilih sebagai alamat utama
-      await sequelize.transaction(async (t) => {
-        await UserAddress.update(
-          { isMain: false },
-          { where: { id_user: userId }, transaction: t }
-        );
-  
-        await existingAddress.update(
-          { isMain: true },
-          { transaction: t }
-        );
-      });
-  
-      return { status: 200, message: "Alamat pengguna berhasil diatur sebagai alamat utama" };
-    } catch (error) {
-      console.error(error);
-      return { status: 500, message: "Internal server error" };
+const setDefault = async (id_user, addressId) => {
+  try {
+    const existingAddress = await UserAddress.findOne({
+      where: { id_user: id_user, id: addressId },
+    });
+
+    if (!existingAddress) {
+      return { status: 400, message: "Alamat pengguna tidak ditemukan" };
     }
-  };
+
+    await sequelize.transaction(async (t) => {
+      // Update isMain to false for all addresses except the selected one
+      await UserAddress.update(
+        { isMain: false },
+        { where: { id_user: id_user, id: { [Op.not]: addressId } }, transaction: t }
+      );
+
+      // Set isMain to true for the selected address
+      await existingAddress.update(
+        { isMain: true },
+        { transaction: t }
+      );
+    });
+
+    return { status: 200, message: "Alamat pengguna berhasil diatur sebagai alamat utama" };
+  } catch (error) {
+    console.error(error);
+    return { status: 500, message: "Internal server error" };
+  }
+};
+
 
   
 module.exports = {

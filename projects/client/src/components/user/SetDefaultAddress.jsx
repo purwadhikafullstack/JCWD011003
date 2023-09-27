@@ -13,64 +13,43 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import axios from "axios";
-import Swal from "sweetalert2";
 
-
-const DeletedAddress = ({ addressId, updateAddressCallback }) => {
+const SetDefault = ({ addressId, isDefault, setDefaultCallback, updateAddressCallback }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const token = localStorage.getItem("token");
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const handleAlertSuccess = () => {
-    // Show success notification
-    Swal.fire({
-      position: 'center-center',
-      icon: 'success',
-      title: "Delete Address successfully😉",
-      showConfirmButton: false,
-      timer: 5000
-    });
-  };
-
-  const handleAlertError = () => {
-    // Show error notification
-    Swal.fire({
-      title: 'Error Delete address😩, Please try again',
-      showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-      },
-      hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-      }
-    });
-  };
-
-  const deleteAddress = async () => {
+  
+  const setDefaultAndModifyAddress = async () => {
     setIsSubmitting(true);
     try {
-      // Make a DELETE request to your API endpoint
-      await axios.delete(
-        `http://localhost:8000/api/address/${addressId}`,
+      // Set the selected address as the default address
+      const setDefaultResponse = await axios.patch(
+        `http://localhost:8000/api/address/default/${addressId}`,
+        {},
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      updateAddressCallback();
-      onClose();
-      handleAlertSuccess();
+      
+      // Check the response status code
+      if (setDefaultResponse.status === 200) {
+        setDefaultCallback(addressId);
+        updateAddressCallback(addressId);
+        onClose();
+      } else {
+        console.error("Error setting default address:", setDefaultResponse);
+      }
     } catch (error) {
-      handleAlertError();
-    } finally {
-      setIsSubmitting(false);
+      console.error("Error setting default address:", error);
     }
   };
 
   return (
     <>
-      <Button size={"xs"} variant={"ghost"} textColor={"red"} onClick={onOpen}>
-        Delete
+      <Button size={"xs"} variant={"ghost"} textColor={"green"} onClick={onOpen} isDisabled={isDefault}>
+        Set as main Address
       </Button>
       <Modal
         isOpen={isOpen}
@@ -82,7 +61,7 @@ const DeletedAddress = ({ addressId, updateAddressCallback }) => {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader size={{ base: "xs", sm: "sm" }}>
-            Delete Address
+            Default Address
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -94,13 +73,13 @@ const DeletedAddress = ({ addressId, updateAddressCallback }) => {
                 textAlign={"center"}
                 fontSize={{ base: "xs", sm: "md" }}
               >
-                Are you sure you want to delete your address
+                Are you sure you want to make the main address
               </FormLabel>
             </FormControl>
           </ModalBody>
           <ModalFooter display={"flex"} alignSelf={"center"}>
             <Button
-              colorScheme="blue"
+              colorScheme="red"
               mr={3}
               onClick={onClose}
               size={{ base: "xs", sm: "sm" }}
@@ -108,13 +87,13 @@ const DeletedAddress = ({ addressId, updateAddressCallback }) => {
               Cancel
             </Button>
             <Button
-              colorScheme="red"
-              onClick={deleteAddress}
+              colorScheme="blue"
+              onClick={setDefaultAndModifyAddress}
               size={{ base: "xs", sm: "sm" }}
               isLoading={isSubmitting} 
-              loadingText="Deleting..."
+              loadingText="Loading..."
             >
-              Delete
+              Select
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -123,4 +102,4 @@ const DeletedAddress = ({ addressId, updateAddressCallback }) => {
   );
 };
 
-export default DeletedAddress;
+export default SetDefault;
