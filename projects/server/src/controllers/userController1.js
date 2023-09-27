@@ -8,7 +8,7 @@ const Stock = db.Stock;
 const Cart = db.Cart;
 const Cart_Stock = db.Cart_Stock;
 
-async function updateCart(req, res) {
+async function updateCart(req, res) { //no get 2 pay 1 logic yet
   try {
     const { stockId, quantity } = req.body;
     const { cartId } = req.user;
@@ -75,7 +75,7 @@ async function updateCart(req, res) {
         }
       );
 
-      res.status(201).json({
+      res.status(201).json({ // do we even need this response? this is a post
         ...cartStockItem.toJSON(), // Existing data from Cart_Stock
         discountPercent: stockItem.discountPercent, // Include discountPercent from Product
         id_stock_promo: stockItem.id_stock_promo,
@@ -86,8 +86,6 @@ async function updateCart(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
-
-
 
   async function transactionUser (req, res) {
     try {
@@ -276,7 +274,7 @@ async function getCartItems(req, res) {
           include: [
             {
               model: Product, 
-              attributes: ['name', 'price', 'productImg'], 
+              attributes: ['name', 'price',], 
             },
           ],
         },

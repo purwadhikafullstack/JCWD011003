@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     id_user: DataTypes.INTEGER,
     totPrice: DataTypes.INTEGER, // don't think this should be the discounted price so totDisc?
     totQty: DataTypes.INTEGER,
+    totDiscount: DataTypes.INTEGER,
     totWeight: DataTypes.FLOAT,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE

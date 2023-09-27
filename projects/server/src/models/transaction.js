@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       id_user: DataTypes.INTEGER,
       id_user_address: DataTypes.INTEGER,
       id_branch: DataTypes.INTEGER,
-      totPrice: DataTypes.FLOAT, // probs shouldn't be the discounted price
-      totPriceDiscount: DataTypes.FLOAT, 
+      totPrice: DataTypes.INTEGER, // probs shouldn't be the discounted price
+      totPriceDiscount: DataTypes.INTEGER, 
       totQty: DataTypes.INTEGER,
       totWeight: DataTypes.INTEGER,
       id_status: {

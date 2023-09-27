@@ -14,8 +14,8 @@ module.exports = {
       },
       {
         promoName: 'Promo 2',
-        buyQty: 2,
-        getQty: 1,
+        buyQty: 1,
+        getQty: 2,
         promoDescription: 'This is the second promo.',
         isActive: true,
         createdAt: new Date(),
@@ -23,8 +23,8 @@ module.exports = {
       },
       {
         promoName: 'Promo 3',
-        buyQty: 3,
-        getQty: 2,
+        buyQty: 2,
+        getQty: 4,
         promoDescription: 'This is the third promo.',
         isActive: true,
         createdAt: new Date(),
