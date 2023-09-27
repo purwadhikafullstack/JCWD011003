@@ -13,9 +13,11 @@ import {
   ModalBody,
   ModalFooter,
   Box,
+  Text,
 } from "@chakra-ui/react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import MapOSMAddress from "./MapOSMAddress";
 
 const AddNewAddress = ({ isOpen, onClose, updateUserData }) => {
   const [formValid, setFormValid] = useState(false);
@@ -31,6 +33,41 @@ const AddNewAddress = ({ isOpen, onClose, updateUserData }) => {
     longitude: "",
     latitude: "",
   });
+  const handleLocationSelect = (latitude, longitude) => {
+    setData({ ...data, latitude, longitude });
+  };
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      // Mendapatkan current position menggunakan geolocation API
+      try {
+        const getCurrentPosition = async () => {
+          return await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
+        }
+        const position = await getCurrentPosition();
+        setData({
+          ...data,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      } catch (error) {
+        console.error("Error getting current location:", error);
+      }
+    };
+
+    fetchProvincesAndCities();
+    fetchLocation();  // Panggil untuk mendapatkan current position
+  }, [selectedProvinceId]); 
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("No token found");
+    return;
+  }
+
+  
 
   const handleAlertSuccess = () => {
     // Show success notification
@@ -56,15 +93,15 @@ const AddNewAddress = ({ isOpen, onClose, updateUserData }) => {
     });
   };
 
-  useEffect(() => {
-    fetchProvincesAndCities();
-  }, [selectedProvinceId]);
+  // useEffect(() => {
+  //   fetchProvincesAndCities();
+  // }, [selectedProvinceId]);
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    console.error("No token found");
-    return;
-  }
+  // const token = localStorage.getItem("token");
+  // if (!token) {
+  //   console.error("No token found");
+  //   return;
+  // }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -134,6 +171,8 @@ const AddNewAddress = ({ isOpen, onClose, updateUserData }) => {
     }
   };
 
+  
+
   return (
     <Box>
       <Modal blockScrollOnMount={false} isCentered isOpen={isOpen} onClose={onClose} size={{ base: "xs", sm: "sm" }}>
@@ -197,7 +236,7 @@ const AddNewAddress = ({ isOpen, onClose, updateUserData }) => {
             </FormControl>
 
             <FormControl colSpan={[6, 3, null, 2]}>
-              <FormLabel htmlFor="userAddress" size={{ base: "xs", sm: "sm" }}>Full Address</FormLabel>
+              <FormLabel htmlFor="userAddress" size={{ base: "xs", sm: "sm" }}>Street Address</FormLabel>
               <Input
                 type="text"
                 name="userAddress"
@@ -208,6 +247,24 @@ const AddNewAddress = ({ isOpen, onClose, updateUserData }) => {
                 value={data.userAddress}
               />
             </FormControl>
+
+            <Box mt={3} mb={1}>
+              <Text fontSize={"sm"} color={"red"} fontWeight={"semibold"}>
+              Set and move the marker based on your location!
+              </Text>
+              <MapOSMAddress
+                latitude={data.latitude || -7.43090049} 
+                longitude={data.longitude || 109.245643615} 
+
+                onLocationSelect={(lat, lng) => {
+                  setData({
+                    ...data,
+                    latitude: lat,
+                    longitude: lng,
+                  });
+                }}
+              />
+            </Box>
 
             <FormControl colSpan={6}>
               <FormLabel htmlFor="longitude" size={{ base: "xs", sm: "sm" }}>Longitude</FormLabel>
