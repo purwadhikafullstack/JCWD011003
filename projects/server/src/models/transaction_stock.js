@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
   class Transaction_Stock extends Model {
     static associate(models) {
       // Define associations here
-      // Transaction_Stock.belongsTo(models.Transaction, { foreignKey: 'id_transaction' });
-      // Transaction_Stock.belongsTo(models.Stock, { foreignKey: 'id_stock' });
+      Transaction_Stock.belongsTo(models.Transaction, { foreignKey: 'id_transaction' });
+      Transaction_Stock.belongsTo(models.Stock, { foreignKey: 'id_stock' });
     }
   }
 
