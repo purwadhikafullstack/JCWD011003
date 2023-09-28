@@ -1,25 +1,11 @@
-const { verifyToken } = require("./auth");
-const { multerUpload } = require("./multer");
-const {
-  validateLogin,
-  validateRegister,
-  validateChangeUsername,
-  validateChangeEmail,
-    validateChangePassword,
-  validateResetPassword,
-  validateForgotPassword,
-  validate,
-} = require("./validation");
+const auth = require("./auth");
+const validation = require("./validation");
+const uploadFile = require("./uploadFile");
+const {multerUpload} = require("./multer");
 
 module.exports = {
-  verifyToken,
-  validateLogin,
-  validateRegister,
-  validateChangeUsername,
-  validateChangeEmail,
-    validateChangePassword,
-  validateResetPassword,
-  validateForgotPassword,
-  validate,
+  auth,
+  validation,
+  uploadFile,
   multerUpload,
 };

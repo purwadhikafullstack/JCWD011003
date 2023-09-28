@@ -9,23 +9,41 @@ app.use(
   cors({
     origin: [
       process.env.WHITELISTED_DOMAIN &&
-        process.env.WHITELISTED_DOMAIN.split(","),
+      process.env.WHITELISTED_DOMAIN.split(","),
     ],
   })
-);
+  );
 
-app.use(express.json());
-const db = require('./models')
-// db.sequelize.sync({alter: true})
+  app.use(express.json());
+  const db = require('./models')
+  // db.sequelize.sync({alter: true})
+  const {vouchersControllers} = require("./controllers");
+  
+const {authRouter, profileRouter, rajaongkirRouter, addressRouter, categoriesRouter, productRouter, stockRouter, stockPromoRouter, vouchersRouter, transactionRouter} = require('./router');
+const path = require("path");
 
-app.use('/api', apiRouter)
-const {authRouter, userRouter} = require('./router')
+app.use('/api/auth', apiRouter,authRouter)
+app.use('/api/profile', apiRouter,profileRouter)
+app.use('/api/rajaongkir', apiRouter,rajaongkirRouter)
+app.use('/api/address', apiRouter,addressRouter)
+app.use('/api/category', categoriesRouter)
+app.use('/api/product', productRouter)
+app.use('/api/stock-promo', stockPromoRouter)
+app.use('/api/stock', stockRouter)
+app.use('/api/vouchers', vouchersRouter)
+app.use('/api/transaction', transactionRouter)
+
+
+// app.use('/api', apiRouter)
+// const {authRouter, userRouter} = require('./router')
 //#region API ROUTES
+// app.use("/public", express.static(path.resolve(__dirname,"../public")))
+app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
+vouchersControllers.scheduleDeleteExpiredVouchers();
 
 // ===========================
 // NOTE : Add your routes here
-apiRouter.use('/auth', authRouter);
-apiRouter.use('/user', userRouter);
+// apiRouter.use('/auth', authRouter)
 // app.get("/api", (req, res) => {
 //   res.send(`Hello, this is my API`);
 // });

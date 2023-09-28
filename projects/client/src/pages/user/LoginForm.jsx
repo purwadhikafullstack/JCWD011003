@@ -3,10 +3,14 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { ExternalLinkIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import {useNavigate} from 'react-router-dom'
+import {
+  ExternalLinkIcon,
+  ViewIcon,
+  ViewOffIcon,
+} from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
 
-// import { loginSuccess } from "../../redux/AuthReduser";
+// import { loginSuccess } from "../../redux/AuthReduser"
 // import { useDispatch } from "react-redux";
 import {
   Box,
@@ -22,25 +26,52 @@ import {
   Center,
   Image,
 } from "@chakra-ui/react";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
+import Swal from "sweetalert2"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate()
-//   const dispatch = useDispatch()
+  const navigate = useNavigate();
+  //   const dispatch = useDispatch()
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
+  const handleLoginSuccess = () => {
+    // Show success notification
+    Swal.fire({
+      position: 'center-center',
+      icon: 'success',
+      title: 'Login Success',
+      showConfirmButton: false,
+      timer: 2500
+    });
+  };
+
+  const handleLoginError = () => {
+    // Show error notification
+    Swal.fire({
+      title: 'Make sure your email and password are correct😩',
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      }
+    });
+  };
 
   return (
     <Box>
-      <Box>
-          <Center>
-            <Image src="LOGO.png" width="10%" height="auto"/>
-          </Center>
+      <Navbar />
+      <Box mt={10}>
+        <Center>
+          <Image src="EcoGroceriesApp.png" width="13%" height="auto" />
+        </Center>
         <Box m="auto" p={6} w={"30%"}>
           <Heading as="h2" size="lg" mb={6} textAlign={"center"}>
-            Log in to your account
+            Login to your account
           </Heading>
           <Formik
             initialValues={{
@@ -58,29 +89,28 @@ const LoginForm = () => {
                 )
                 .required("Password is required"),
             })}
-            onSubmit={(values, { setSubmitting }) => { 
+            onSubmit={(values, { setSubmitting }) => {
+              setSubmitting(true); // Set submitting to true when the form is being submitted.
               axios
-                .post(
-                  "https://minpro-blog.purwadhikabootcamp.com/api/auth/login",
-                  {
-                    email: values.email,
-                    password: values.password,
-                  }
-                )
+                .post("http://localhost:8000/api/auth/login", {
+                  email: values.email,
+                  password: values.password,
+                })
                 .then(function (response) {
-                  console.log(JSON.stringify(response.data));
-                //   dispatch(loginSuccess(response.data.token))
-
-                  // alert(response.data.message)
-                  navigate('/')
-                  setSubmitting(false);
+                  localStorage.setItem("token", response.data.data.token);
+                  handleLoginSuccess();
+                  navigate("/");
                 })
                 .catch(function (error) {
                   console.log(error);
-                  setSubmitting(false);
+                  handleLoginError();
+                })
+                .finally(() => {
+                  setSubmitting(false); 
                 });
             }}
           >
+            {({ isSubmitting }) => (
             <Form>
               <FormControl id="email" mb={3}>
                 <FormLabel>Email</FormLabel>
@@ -89,7 +119,6 @@ const LoginForm = () => {
                   name="email"
                   as={Input}
                   placeholder="Enter your email address"
-                  // borderColor={"black"}
                 />
                 <ErrorMessage name="email" component={Text} color="red" />
               </FormControl>
@@ -101,21 +130,14 @@ const LoginForm = () => {
                     name="password"
                     as={Input}
                     placeholder="Enter your password"
-                    // borderColor={"black"}
                   />
                   <InputRightElement width="3rem">
                     <Button
-                      // variant="link"
-                      // colorScheme="black"
                       h="1.5rem"
                       size="sm"
                       onClick={handleTogglePassword}
                     >
-                      {showPassword ? (
-                        <ViewOffIcon  />
-                      ) : (
-                        <ViewIcon  />
-                      )}
+                      {showPassword ? <ViewOffIcon /> : <ViewIcon />}
                     </Button>
                   </InputRightElement>
                 </InputGroup>
@@ -126,31 +148,33 @@ const LoginForm = () => {
                 colorScheme="teal"
                 mb={6}
                 width="full"
-                // variant={"outline"}
-                // borderColor={"black"}
+                isLoading={isSubmitting}
+                loadingText="Logging in..."
               >
-                Log in
+                Login
               </Button>
             </Form>
+            )}
           </Formik>
           <Text>
             Forgot your password?{" "}
-            <LinkChakra textColor={'teal'}>
-            <Link to="/forgotpass" Color={"teal"}>
-              Reset Password <ExternalLinkIcon mx="2px" />
-            </Link>
+            <LinkChakra textColor={"teal"}>
+              <Link to="/forgot-password" Color={"teal"}>
+                Reset Password <ExternalLinkIcon mx="2px" />
+              </Link>
             </LinkChakra>
           </Text>
           <Text>
             Don't have an account?{" "}
-            <LinkChakra textColor={'teal'}>
-            <Link to="/register" >
-              Sign up here <ExternalLinkIcon mx="2px" />
-            </Link>
+            <LinkChakra textColor={"teal"}>
+              <Link to="/register">
+                Sign up here <ExternalLinkIcon mx="2px" />
+              </Link>
             </LinkChakra>
           </Text>
         </Box>
       </Box>
+      <Footer/>
     </Box>
   );
 };

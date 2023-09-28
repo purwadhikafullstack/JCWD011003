@@ -1,11 +1,13 @@
 const router = require("express").Router();
-const { authController } = require("../controllers");
-const {  validateRequest,  validateLogin,  validateRegistration,  validateForgotPassword,  validateResetPassword,} = require("../middleware/validation");
-const {  verifyToken,  verifyAdmin,  verifyCashierStatus,  verifyUserExist,} = require("../middleware/auth");
+const { authControllers } = require('../controllers');
+const { auth, validation } = require("../middleware");
 
-router.post(  "/login",   authController.userLogin);
-router.post(  "/user",  authController.createUser);
-// router.put(  "/forgotpass",  validateForgotPassword,  validateRequest,  authController.forgotPassword);
-// router.patch(  "/resetpass",  verifyToken,  verifyUserExist,  validateResetPassword,  validateRequest,  authController.resetPassword);
+router.post("/register", validation.vRegistrationFields, validation.vResult, authControllers.register);
+// router.get("/user/:id", authControllers.getUserById);
+router.patch("/verify", auth, authControllers.verify);
+router.post("/login", validation.vLoginFields, validation.vResult, authControllers.login);
+router.get("/login", auth, authControllers.keepLogin);
+router.post("/forgot", authControllers.forgotPassword);
+router.patch("/reset", auth, validation.vResetPasswordFields, validation.vResult,authControllers.resetPassword);
 
 module.exports = router;
