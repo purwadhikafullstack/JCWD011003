@@ -8,9 +8,10 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import ListProduct from "../admin/ListProduct";
+import ListProduct from "../user/ListProductYK";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
+import Footer from "../Footer";
 
 const getReverseGeolocation = async (latitude, longitude) => {
   try {
@@ -124,6 +125,7 @@ const LandingYkAround = () => {
         </Text>
         <ListProduct />
       </Box>
+      <Footer />
     </>
   );
 };

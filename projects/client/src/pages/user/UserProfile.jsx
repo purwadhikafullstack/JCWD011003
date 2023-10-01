@@ -228,13 +228,12 @@ const formatBirthday = (birthday) => {
               <Heading fontSize={{ base: "2xl", sm: "xl" }}>
               {userData.name}
               </Heading>
-              {/* <Text>{userData.birthday}</Text>
+              <Text>{userData.birthday}</Text>
               <Text>{userData.email}</Text>
-              <Text>{userData.phone}</Text> */}
-              {/* <Text>{userData.referral}</Text>
-              <Text>{userData.referred_by}</Text> */}
+              <Text>{userData.phone}</Text>
+              <Text>{userData.referral}</Text>
+              <Text>{userData.referred_by}</Text>
             </Box>
-
           </FormControl>
         </Box>
 
