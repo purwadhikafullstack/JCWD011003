@@ -269,11 +269,12 @@ const stockControllers = {
   getAllStock: async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
-      const pageSize = parseInt(req.query.pageSize) || 100;
+      const pageSize = parseInt(req.query.pageSize) || 10;
       const idProduct = parseInt(req.query.id_product);
       const idCategory = parseInt(req.query.id_category);
       const orderByName = req.query.orderByName;
       const orderByPrice = req.query.orderByPrice;
+      const name = req.query.name;
 
       const offset = (page - 1) * pageSize;
       const limit = pageSize;
@@ -292,13 +293,15 @@ const stockControllers = {
       }
       if (orderByPrice) {
         order.push(["Product", "price", orderByPrice]);
+      } if (name) {
+        whereClause["$Product.name$"] = { [Sequelize.Op.like]: `%${name}%` };
       }
 
       const { count, rows: allStock } = await Stock.findAndCountAll({
         include: [
           {
             model: Product,
-            attributes: ["id", "name", "price", "productImg", "id_category"],
+            attributes: ["id", "name", "price", "description", "productImg", "id_category"],
             include: [
               {
                 model: Category,
@@ -331,14 +334,58 @@ const stockControllers = {
 
       return res.status(200).json({
         message: "Get all stock records successfully",
-        data: allStock,
         currentPage: page,
         totalPages,
         pageSize,
         totalItems: count,
+        data: allStock,
       });
     } catch (error) {
       console.error("Error fetching all stock records:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  },
+
+
+  
+  getStockById: async (req, res) => {
+    try {
+      const stockId = parseInt(req.params.id); // Get the stock ID from the URL parameter
+  
+      // Find the stock record by ID
+      const stock = await Stock.findByPk(stockId, {
+        include: [
+          {
+            model: Product,
+            attributes: ["id", "name", "price", "description", "productImg", "id_category"],
+            include: [
+              {
+                model: Category,
+                attributes: ["id", "category"],
+              },
+            ],
+          },
+          {
+            model: Branch,
+            attributes: ["id", "name"],
+          },
+          {
+            model: Stock_Promos,
+            attributes: ["id", "promoName"],
+          },
+        ],
+      });
+  
+      if (!stock) {
+        return res.status(404).json({ message: "Stock record not found" });
+      }
+  
+      return res.status(200).json({
+        message: "Get stock record by ID successfully",
+        data: stock,
+      });
+    } catch (error) {
+      console.error("Error fetching stock record by ID:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   },

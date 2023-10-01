@@ -6,6 +6,7 @@ router.patch("/", stockControllers.updateAndRetrieveStock);
 router.patch("/add", stockControllers.addStockProduct);
 router.patch("/reduce", stockControllers.reduceStockProduct);
 router.get("/", stockControllers.getAllStock);
+router.get("/:id", stockControllers.getStockById);
 router.patch("/deactivate-stock/:id", stockControllers.deactivateStock);
 router.patch("/activate-stock/:id", stockControllers.activateStock);
 

@@ -58,6 +58,12 @@ const Navbar = () => {
       color="white"
       padding="1rem"
       boxShadow={"xl"}
+      // position="fixed" /* Tambahkan style ini */
+      // top="0" /* Membuat navbar tetap di atas */
+      // left="0" /* Membuat navbar tetap di kiri */
+      // right="0" /* Membuat navbar tetap di kanan */
+      // zIndex="999" /* Menentukan urutan tumpukan di atas elemen-elemen lain */
+      // width="100%"
     >
       <Flex align="center">
         <a href="/">
@@ -89,7 +95,7 @@ const Navbar = () => {
           About
         </Link>
         <Link href="/contact">Contact</Link>
-        <InputGroup borderRadius={"full"} size="xs" ml={'3'}>
+        {/* <InputGroup borderRadius={"full"} size="xs" ml={'3'}>
           <InputLeftElement
             pointerEvents="none"
             children={<Search2Icon color="white" />}
@@ -101,7 +107,7 @@ const Navbar = () => {
             border="1px solid white"
             rounded={"full"}
           />
-        </InputGroup>
+        </InputGroup> */}
       </Flex>
       <Box display="flex" alignItems="center">
         {token ? (

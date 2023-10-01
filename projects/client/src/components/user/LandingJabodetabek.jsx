@@ -7,9 +7,11 @@ import {
   Button,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import Products from "../Products";
+import ListProduct from "../user/ListProductYK";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
+import Footer from "../Footer";
+
 
 const getReverseGeolocation = async (latitude, longitude) => {
   try {
@@ -101,6 +103,7 @@ const LandingJabodetabek = () => {
         justifyContent="center"
         color="white"
         textShadow="0px 2px 4px rgba(0, 0, 0, 0.5)"
+        pb={10}
       >
         <Text fontSize="2xl" fontWeight={"semibold"} textAlign="center">
           Your Current Position:
@@ -121,8 +124,9 @@ const LandingJabodetabek = () => {
         <Text fontSize="xl" fontWeight={"semibold"} mt={4} mb={5} textAlign="center">
           Your One-Stop Shop for Eco-Friendly Products
         </Text>
-        <Products />
+        <ListProduct />
       </Flex>
+      <Footer />
     </>
   );
 };
