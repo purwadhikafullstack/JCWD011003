@@ -8,13 +8,14 @@ module.exports = (sequelize, DataTypes) => {
       User_Address.hasMany(models.Transaction, { foreignKey: 'id_user_address' });
     }
   };
+
   User_Address.init({
     userName: DataTypes.STRING,
     userAddress: DataTypes.STRING,
     userCity: DataTypes.STRING,
     userProvince: DataTypes.STRING,
-    longitude: DataTypes.STRING,
-    latitude: DataTypes.STRING,
+    longitude: DataTypes.DOUBLE,
+    latitude: DataTypes.DOUBLE,
     id_user: DataTypes.INTEGER,
     isMain: {
       type: DataTypes.BOOLEAN,

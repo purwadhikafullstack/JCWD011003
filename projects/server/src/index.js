@@ -35,6 +35,8 @@ app.use('/api/vouchers', vouchersRouter)
 app.use('/api/transaction', transactionRouter)
 
 
+// app.use('/api', apiRouter)
+// const {authRouter, userRouter} = require('./router')
 //#region API ROUTES
 // app.use("/public", express.static(path.resolve(__dirname,"../public")))
 app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
