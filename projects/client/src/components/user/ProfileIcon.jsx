@@ -1,4 +1,3 @@
-// import { motion } from 'framer-motion';
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -13,6 +12,7 @@ import {
   MenuDivider,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { BsFillCartCheckFill } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -20,6 +20,7 @@ import axios from "axios";
 
 const Profile = () => {
   const [userData, setUserData] = useState({ name: '', avatar: '' });
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
 
   
   const handleLogout = () => {

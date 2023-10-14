@@ -1,7 +1,7 @@
-import React, { ReactNode, useState, useEffect } from 'react';
-import { Container, Flex, FlexProps, Text, useColorModeValue } from '@chakra-ui/react';
+import React from 'react';
+import { Container, Flex, useColorModeValue } from '@chakra-ui/react';
 
-const PaginationContainer = ({currentPage, setCurrentPage, selectedProduct}) => {
+const PaginationContainer = ({currentPage, setCurrentPage, selectedProduct, totalPages}) => {
   return (
     <Container
       d="flex"
@@ -11,6 +11,7 @@ const PaginationContainer = ({currentPage, setCurrentPage, selectedProduct}) => 
     >
       <Pagination
         currentPage={currentPage}
+        totalPages={totalPages}
         onPageChange={(newPage) => setCurrentPage(newPage)}
         howNext={selectedProduct && selectedProduct.length > 0}
       />
@@ -18,7 +19,15 @@ const PaginationContainer = ({currentPage, setCurrentPage, selectedProduct}) => 
   );
 };
 
-const Pagination = ({ currentPage, onPageChange, showNext }) => {
+const Pagination = ({ currentPage, onPageChange, totalPages }) => {
+  const getpages = () => {
+    let pages = []
+    for (let i = 1 ; i <= totalPages ; i++ ) {
+      pages.push(i)
+    }
+    return pages
+  }
+  const isMobile = window.innerWidth <= 768;
   return (
     <Flex
       as="nav"
@@ -31,21 +40,24 @@ const Pagination = ({ currentPage, onPageChange, showNext }) => {
       <PaginationButton
         onClick={() => onPageChange(currentPage - 1)}
         isDisabled={currentPage === 1}
+        style={{ fontSize: isMobile ? '14px' : '', padding: isMobile ? '5px 10px' : '' }}
       >
         Previous
       </PaginationButton>
-      {[1, 2, 3, 4, 5].map((pageNumber) => (
+      {getpages().map((pageNumber) => (
         <PaginationButton
           key={pageNumber}
           isActive={pageNumber === currentPage}
           onClick={() => onPageChange(pageNumber)}
+          style={{ fontSize: isMobile ? '14px' : '', padding: isMobile ? '5px 10px' : '' }}
         >
           {pageNumber}
         </PaginationButton>
       ))}
       <PaginationButton
         onClick={() => onPageChange(currentPage + 1)}
-        // isDisabled={!showNext}
+        isDisabled={currentPage===totalPages}
+        style={{ fontSize: isMobile ? '14px' : '', padding: isMobile ? '5px 10px' : '' }}
       >
         Next
       </PaginationButton>

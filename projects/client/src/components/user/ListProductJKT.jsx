@@ -8,7 +8,6 @@ import {
 } from "@chakra-ui/react";
 import { MdShoppingCartCheckout } from "react-icons/md";
 import { Search2Icon } from "@chakra-ui/icons";
-import { BsPlusSlashMinus } from "react-icons/bs";
 import {
   Box,
   Flex,
@@ -18,8 +17,6 @@ import {
   Stack,
   Image,
   Button,
-  useToast,
-  Spacer,
 } from "@chakra-ui/react";
 import Category from "./Category";
 import ProductDetail from "./ProductDetail";
@@ -27,63 +24,49 @@ import Pagination from "../user/PaginationProduct";
 import { Link } from "react-router-dom";
 
 export default function Product() {
-  const toast = useToast();
   const bgColor = useColorModeValue("rgb(255,255,255, 0.9)", "gray.800");
   const [product, setProduct] = useState([]);
-  const [quantities, setQuantities] = useState([]); // Initialize quantities state
-  const [cartItems, setCartItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState([]);
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [name, setName] = useState("");
-  const [totalPages, setTotalPages] = useState("");
-
-  useEffect(() => {
-    // Initialize quantities state with default quantity (1) for each product
-    const initialQuantities = new Array(product.length).fill(1);
-    setQuantities(initialQuantities);
-  }, [product]);
-
+  const [totalPages, setTotalPages] = useState(0);
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
-  const handleCategoryFilter = (categoryId) => {
-    setCategory(categoryId);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault(); // Prevent the form from submitting and refreshing the page
-    fetchProduct();
+  const handleCategoryFilter = (id_category) => {
+    setCategory(id_category);
+    if (category===id_category) {
+        setCategory(null)
+    } else {
+        setCategory(id_category)
+    }
   };
 
   const fetchProduct = async () => {
     try {
-      let apiUrl = `http://localhost:8000/api/stock/?page=${currentPage}`;
+      let apiUrl = `http://localhost:8000/api/stock/?page=${currentPage}&id_branch=2`;
 
       if (searchQuery) {
         apiUrl += `&name=${searchQuery}`;
       }
-
       if (price) {
-        apiUrl += `&orderBy=${price}`;
+        apiUrl += `&orderByPrice=${price}`;
       }
-
       if (category) {
         apiUrl += `&id_category=${category}`;
       }
-
       if (name) {
         apiUrl += `&orderByName=${name}`;
       }
 
       const response = await axios.get(apiUrl);
-      setProduct(response.data.data);
-      setTotalPages(response.totalPages);
-      console.log(totalPages, "cek cek");
+      const yogyakartaStock = response.data.data
+    setProduct(yogyakartaStock);
+    setTotalPages(response.data.totalPages);
     } catch (err) {
-      console.log(err);
     }
   };
 
@@ -91,84 +74,36 @@ export default function Product() {
     fetchProduct();
   }, [currentPage, price, category, name, searchQuery]);
 
-  const handleAddToCart = async (productId, index) => {
-    // Pass the index of the product
-    const token = localStorage.getItem("token"); // Replace with your actual token key
-
-    if (!token) {
-      console.error("No token found in local storage");
-      return;
-    }
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/transaction/start",
-        {
-          productId: productId,
-          quantity: quantities[index], // Use the quantity for the specific product
-        },
-        config
-      );
-      setCartItems(response.data.cartItems);
-      toast({
-        title: "Item Added to Cart",
-        description: "The item has been added to your cart.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-      console.log("Cart updated:", response.data);
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-    }
-  };
-
   const handleSortPrice = (e) => {
     setPrice(e.target.value);
   };
   const handleSortName = (e) => {
     setName(e.target.value);
   };
-  const handlefilterCategory = (value) => {
-    setCategory(value);
-  };
 
   const formatPriceAsIDR = (price) => {
-    // Ensure the price is a number
     const numericPrice = parseFloat(price);
     if (isNaN(numericPrice)) {
       return "";
     }
-
-    // Format the price without decimal part
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0, // Set both minimum and maximum to 0
+      maximumFractionDigits: 0, 
     }).format(numericPrice);
   };
 
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const handleProductClick = (product) => {
-    setSelectedProduct(product);
-  };
-
+  
   const handleCloseProductDetail = () => {
     setSelectedProduct(null);
   };
 
   return (
-    <Box minW={"1190"} maxW={"1190"}>
-      <Box width={"98%"} m={"4"}>
-        <InputGroup borderRadius={"full"} size="sm">
+    <Box minW={["","1190"]} maxW={["","1190"]}>
+      <Box width={["91%","97%"]} ml={'4'}>
+        <InputGroup borderRadius={"full"} size={["xs","sm"]}>
           <InputLeftElement
             pointerEvents="none"
             children={<Search2Icon color="white.600" />}
@@ -183,7 +118,7 @@ export default function Product() {
           />
           <InputRightAddon p={0} borderRightRadius={"full"}>
             <Button
-              size="sm"
+              size={["xs","sm"]}
               rounded={"full"}
               variant={"outline"}
               onClick={fetchProduct}
@@ -198,7 +133,7 @@ export default function Product() {
         setPrice={setPrice}
         handleSortPrice={handleSortPrice}
         category={category}
-        handleFilterCategory={handleCategoryFilter}
+        handleCategoryFilter={handleCategoryFilter}
         name={name}
         handleSortName={handleSortName}
         setName={setName}
@@ -211,7 +146,7 @@ export default function Product() {
             align={"center"}
             role="group"
             p={4}
-            maxW="212px"
+            maxW={{ base: "43%", md: "212px" }}
             w="full"
             bg={bgColor}
             boxShadow="md"
@@ -225,7 +160,7 @@ export default function Product() {
                 rounded="lg"
                 mt={-8}
                 pos="relative"
-                height="120px"
+                height={["80px","120px"]}
                 _after={{
                   transition: "all .3s ease",
                   content: '""',
@@ -246,7 +181,7 @@ export default function Product() {
               >
                 <Image
                   borderRadius="xl"
-                  height={130}
+                  height={[90,130]}
                   width={190}
                   objectFit="contain"
                   src={`http://localhost:8000/api/${product.Product.productImg}`}
@@ -262,12 +197,12 @@ export default function Product() {
                 >
                   {product.Product.Category?.category}
                 </Text>
-                <Heading color="black" fontFamily="cursive" fontSize="md" m={0}>
+                <Heading color="black" fontFamily="cursive" fontSize={["sm","md"]} m={0}>
                   {product.Product.name}
                 </Heading>
                 <Stack align={"center"} justify={"center"}>
                   <Flex>
-                    <Text fontWeight={800} fontSize={"md"} color={"teal"}>
+                    <Text fontWeight={800} fontSize={["sm","md"]} color={"teal"}>
                       {" "}
                       {formatPriceAsIDR(
                         product.Product.price -
@@ -275,60 +210,30 @@ export default function Product() {
                             100
                       )}
                     </Text>
-                    <Text color={"red"} fontSize={"xs"}>
+                    <Text color={"red"} fontSize={["2xs","xs"]}>
                       {product.discountPercent}%
                     </Text>{" "}
                   </Flex>
                   <Text
                     textDecoration={"line-through"}
                     color={"gray.600"}
-                    fontSize={"xs"}
+                    fontSize={["2xs","xs"]}
                   >
                     {formatPriceAsIDR(product.Product.price)}
                   </Text>
                 </Stack>
               </Stack>
             </Link>
-            <Flex>
-              <BsPlusSlashMinus
-                color="black"
-                onClick={() =>
-                  setQuantities((prevQuantities) => {
-                    const updatedQuantities = [...prevQuantities];
-                    updatedQuantities[index] = Math.max(
-                      updatedQuantities[index] - 1,
-                      1
-                    );
-                    return updatedQuantities;
-                  })
-                }
-              />
-              <Input
-                type="number"
-                textColor={"black"}
-                value={quantities[index]}
-                onChange={(e) =>
-                  setQuantities((prevQuantities) => {
-                    const updatedQuantities = [...prevQuantities];
-                    updatedQuantities[index] = Math.max(
-                      parseInt(e.target.value),
-                      1
-                    );
-                    return updatedQuantities;
-                  })
-                }
-                placeholder="Input Qty"
-                w={"9"}
-                size={"xs"}
-              />
-              <Spacer />
+            <Link to={`/product/${product.id}`}>
               <Button
-                variant="link"
-                onClick={() => handleAddToCart(product.id, index)}
-              >
-                <MdShoppingCartCheckout color="black" size={20} />
+                size={'md'}
+                fontSize={'small'}
+                variant={'ghost'}
+                _hover={{ backgroundColor: 'teal.200' }} 
+              > Shop now
+                <MdShoppingCartCheckout color="black" size={15} />
               </Button>
-            </Flex>
+            </Link>
           </Box>
         ))}
       </Flex>
@@ -336,13 +241,13 @@ export default function Product() {
       {selectedProduct && (
         <ProductDetail
           product={selectedProduct}
-          onAddToCart={handleAddToCart}
           onClose={handleCloseProductDetail}
         />
       )}
       <Pagination
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
+        selectedProduct={selectedProduct}
         totalPages={totalPages}
       />
     </Box>
