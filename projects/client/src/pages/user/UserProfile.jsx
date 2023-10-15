@@ -144,7 +144,6 @@ export default function UserProfileEdit() {
 
   return (
     <Box>
-      <Navbar />
       {isMobileView ? (
         <VStack
         w={"full"}
@@ -391,7 +390,6 @@ export default function UserProfileEdit() {
         </Box>
       </Flex>
       )}
-      <Footer />
     </Box>
   );
 }
