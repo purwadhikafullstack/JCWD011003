@@ -19,20 +19,23 @@ app.use(
   // db.sequelize.sync({alter: true})
   const {vouchersControllers} = require("./controllers");
   
-const {authRouter, adminRouter, profileRouter, rajaongkirRouter, addressRouter, categoriesRouter, productRouter, stockRouter, stockPromoRouter, vouchersRouter, transactionRouter} = require('./router');
-const path = require("path");
-
-app.use('/api/auth', apiRouter,authRouter)
-app.use('/api/admin', apiRouter,adminRouter)
-app.use('/api/profile', apiRouter,profileRouter)
-app.use('/api/rajaongkir', apiRouter,rajaongkirRouter)
-app.use('/api/address', apiRouter,addressRouter)
-app.use('/api/category', categoriesRouter)
-app.use('/api/product', productRouter)
-app.use('/api/stock-promo', stockPromoRouter)
-app.use('/api/stock', stockRouter)
-app.use('/api/vouchers', vouchersRouter)
-app.use('/api/transaction', transactionRouter)
+  const {authRouter, adminRouter,userRouter, profileRouter, rajaongkirRouter, addressRouter, categoriesRouter, productRouter, stockRouter, stockPromoRouter, vouchersRouter, transactionRouter} = require('./router');
+  const path = require("path");
+  
+  app.use('/api', apiRouter)
+  apiRouter.use('/user', userRouter)
+  // apiRouter.use('/admin', apiRouter,adminRouter)
+  apiRouter.use('/profile', profileRouter)
+  apiRouter.use('/rajaongkir', rajaongkirRouter)
+  apiRouter.use('/auth', authRouter)
+  apiRouter.use('/address', addressRouter)
+  apiRouter.use('/category', categoriesRouter)
+  apiRouter.use('/product', productRouter)
+  apiRouter.use('/stock-promo', stockPromoRouter)
+  apiRouter.use('/stock', stockRouter)
+  apiRouter.use('/vouchers', vouchersRouter)
+  apiRouter.use('/transaction', transactionRouter)
+  apiRouter.use('/admin', adminRouter)
 
 
 //#region API ROUTES

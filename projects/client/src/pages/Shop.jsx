@@ -86,9 +86,7 @@ const Shop = () => {
   if (!userLocation) {
     return (
       <>
-        <Box>
-          <Navbar />
-        </Box>
+   
         <Box
           w={"full"}
           h={"100%"}
@@ -208,9 +206,6 @@ const Shop = () => {
             <LandingUnreachArea />
             </Box>
             )}
-      <Box>
-        <Footer />
-      </Box>
     </>
   );
 };

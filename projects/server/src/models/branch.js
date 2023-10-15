@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   class Branch extends Model {
     static associate(models) {
       // define association here
-      Branch.belongsTo(models.Admin, { foreignKey: 'id_admin' });
+      Branch.hasMany(models.Admin, { foreignKey: 'id_branch' });
       Branch.hasMany(models.Stock, { foreignKey: 'id_branch' });
     }
   };

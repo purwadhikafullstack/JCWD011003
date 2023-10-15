@@ -5,11 +5,19 @@ module.exports = (sequelize, DataTypes) => {
   class Cart_Stock extends Model {
     static associate(models) {
       // Define associations here
+      Cart_Stock.belongsTo(models.Cart, { foreignKey: 'id_cart' }); 
+      Cart_Stock.belongsTo(models.Stock, { foreignKey: 'id_stock' });
     }
   }
 
   Cart_Stock.init(
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+      },
       id_cart: {
         type: DataTypes.INTEGER,
         defaultValue: 0
@@ -26,7 +34,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       weight: {
         type: DataTypes.INTEGER
-      }
+      },
+      discount: DataTypes.INTEGER,
     },
     {
       sequelize,
