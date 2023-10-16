@@ -94,7 +94,7 @@ const router = createBrowserRouter(
       <Route path="shop" element={<ProtectedRoute allowedRoles={['user']}><ShopLayout /></ProtectedRoute>} >
         <Route index element={<ProtectedRoute allowedRoles={['user']}><Shop /></ProtectedRoute>} />
         <Route path="yk" element={<ProtectedRoute allowedRoles={['user']}><LandingYkAround /></ProtectedRoute>} />
-        <Route path="kt" element={<ProtectedRoute allowedRoles={['user']}><LandingJabodetabek /></ProtectedRoute>} />
+        <Route path="jkt" element={<ProtectedRoute allowedRoles={['user']}><LandingJabodetabek /></ProtectedRoute>} />
         <Route path=":id" element={<ProtectedRoute allowedRoles={['user']}><ProductDetail /></ProtectedRoute>} loader={productDetailsLoader} />
       </Route>
       <Route path="payment" element={<ProtectedRoute allowedRoles={['user']}><Payment /></ProtectedRoute>}/>

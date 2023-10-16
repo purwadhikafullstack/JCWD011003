@@ -27,7 +27,7 @@ async function Payment (req, res) {
             id_transaction: trId,
             paymentProof: req.file.path
         })
-        res.status(200).json(paid)
+        res.status(200).json(trId)
     } catch (error) {
         console.error(error)
         res.status(500).json(error)

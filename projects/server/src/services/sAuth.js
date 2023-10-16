@@ -10,6 +10,7 @@ require("dotenv").config({
 const db = require("../models");
 const { Op } = require("sequelize");
 const users = db.User;
+const carts = db.Cart;
 const JWT_KEY = process.env.JWT_KEY;
 const VERIFY_MESSAGE = "Please check your email to verify your account";
 const BASE_REDIRECT = "http://localhost:3000";
