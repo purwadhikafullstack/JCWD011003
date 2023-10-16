@@ -17,7 +17,9 @@ const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
 
   const getBranchName = (branchId) => {
-    return branchId === 2 ? "Jabodetabek EcoGroceries" : "Yogyakarta EcoGroceries";
+    return branchId === 2
+      ? "Jabodetabek EcoGroceries"
+      : "Yogyakarta EcoGroceries";
   };
 
   useEffect(() => {
@@ -41,38 +43,43 @@ const TransactionList = () => {
         <Text fontSize="2xl" fontWeight="bold">
           List of All Transactions
         </Text>
-        <Table variant="striped" colorScheme="teal" size={"sm"}>
-          <Thead>
-            <Tr>
-              <Th textAlign={"center"}>No.</Th>
-              <Th textAlign={"center"}>User</Th>
-              <Th textAlign={"center"}>Branch</Th>
-              <Th textAlign={"center"}>User Address</Th>
-              <Th textAlign={"center"}>Total Price</Th>
-              <Th textAlign={"center"}>Total Quantity</Th>
-              <Th textAlign={"center"}>Date</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {transactions.map((transaction, index) => (
-              <Tr key={transaction.id}>
-                <Td textAlign={"center"}>{index + 1}</Td>
-                <Td textAlign={"center"}>{transaction.id_user}</Td>
-                <Td textAlign={"center"}>
-                  {getBranchName(transaction.id_branch)}
-                </Td>
-                <Td textAlign={"center"}>{transaction.userAddress}</Td>
-                <Td textAlign={"center"}>{transaction.totPrice}</Td>
-                <Td textAlign={"center"}>{transaction.totQty}</Td>
-                <Td textAlign={"center"}>
-                  {new Date(transaction.createdAt).toLocaleDateString("id-ID", {
-                    timeZone: "Asia/Jakarta",
-                  })}
-                </Td>
+        <Box overflowY="scroll" maxHeight="270px">
+          <Table variant="striped" colorScheme="teal" size={"sm"}>
+            <Thead>
+              <Tr>
+                <Th textAlign={"center"}>No.</Th>
+                <Th textAlign={"center"}>User</Th>
+                <Th textAlign={"center"}>Branch</Th>
+                <Th textAlign={"center"}>User Address</Th>
+                <Th textAlign={"center"}>Total Price</Th>
+                <Th textAlign={"center"}>Total Quantity</Th>
+                <Th textAlign={"center"}>Date</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
+            </Thead>
+            <Tbody>
+              {transactions.map((transaction, index) => (
+                <Tr key={transaction.id}>
+                  <Td textAlign={"center"}>{index + 1}</Td>
+                  <Td textAlign={"center"}>{transaction.User.name}</Td>
+                  <Td textAlign={"center"}>
+                    {getBranchName(transaction.id_branch)}
+                  </Td>
+                  <Td textAlign={"center"}>{transaction.userAddress}</Td>
+                  <Td textAlign={"center"}>{transaction.totPrice}</Td>
+                  <Td textAlign={"center"}>{transaction.totQty}</Td>
+                  <Td textAlign={"center"}>
+                    {new Date(transaction.createdAt).toLocaleDateString(
+                      "id-ID",
+                      {
+                        timeZone: "Asia/Jakarta",
+                      }
+                    )}
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
       </Box>
     </VStack>
   );

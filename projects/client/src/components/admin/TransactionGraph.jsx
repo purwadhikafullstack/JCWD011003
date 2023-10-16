@@ -61,7 +61,7 @@ const TransactionGraph = () => {
         Total Sales Per Day Graph
       </Heading>
       <Box display={"flex"} justifyContent={"center"}>
-        <LineChart width={1200} height={400} data={graphData.reverse()}> {/* Reverse the data */}
+        <LineChart width={1200} height={400} data={graphData}> {/* Reverse the data */}
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />

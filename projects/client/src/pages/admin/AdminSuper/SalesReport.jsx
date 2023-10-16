@@ -2,6 +2,7 @@ import React from 'react'
 import { Box, Heading } from "@chakra-ui/react";
 import TransactionGraph from '../../../components/admin/TransactionGraph';
 import TransactionList from '../../../components/admin/TransactionList';
+import TransactionReport from '../../../components/admin/TransactionReport';
 
 const SalesReport = () => {
   return (
@@ -14,6 +15,9 @@ const SalesReport = () => {
         <Box boxShadow={"lg"} mt={2}>
           <TransactionList   />
         </Box>
+        {/* <Box>
+          <TransactionReport/>
+        </Box> */}
       </Box>
     </>
   )
