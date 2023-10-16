@@ -17,7 +17,7 @@ function Payment() {
             Authorization: authorizationHeader,
           },
         });
-        console.log(response);
+        console.log('unpaid',response);
         setTrId(response.data.id);
       } catch (error) {
         console.error('error fetching unpaid transaction', error);

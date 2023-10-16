@@ -7,12 +7,9 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 app.use(
   cors({
-    origin: [
-      process.env.WHITELISTED_DOMAIN &&
-      process.env.WHITELISTED_DOMAIN.split(","),
-    ],
+    origin: process.env.WHITELISTED_DOMAIN && process.env.WHITELISTED_DOMAIN.split(","),
   })
-  );
+);
 
   app.use(express.json());
   const db = require('./models')
@@ -90,6 +87,7 @@ app.get("*", (req, res) => {
 
 //#endregion
 
+
 app.listen(PORT, (err) => {
   if (err) {
     console.log(`ERROR: ${err}`);
@@ -97,3 +95,4 @@ app.listen(PORT, (err) => {
     console.log(`APP RUNNING at ${PORT} ✅`);
   }
 });
+
