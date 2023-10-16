@@ -12,12 +12,6 @@ module.exports = (sequelize, DataTypes) => {
 
   Cart_Stock.init(
     {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false
-      },
       id_cart: {
         type: DataTypes.INTEGER,
         defaultValue: 0

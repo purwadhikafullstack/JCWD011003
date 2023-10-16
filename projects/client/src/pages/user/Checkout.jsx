@@ -67,6 +67,7 @@ function Checkout() {
         setResponse2(response.data);
         console.log("res2", response);
         const numb = response.data[0].Stock.id_branch;
+        console.log('br', numb)
         setBranch(numb);
         updateBody({id_branch: numb})
         console.log("useeffect", branch)
@@ -105,6 +106,7 @@ function Checkout() {
               Authorization: authorizationHeader,
             },
           });
+          console.log('add', response)     
           setAddresses(response.data.address);
           updateShip({origin:response.data.branchCity})
           if (response.data.length > 0) {

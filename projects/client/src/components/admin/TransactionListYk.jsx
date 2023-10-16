@@ -9,24 +9,25 @@ import {
   Th,
   Td,
   VStack,
-  Heading,
   Text,
 } from "@chakra-ui/react";
 
-const TransactionList = () => {
+const TransactionListYk = () => {
   const [transactions, setTransactions] = useState([]);
-
-  const getBranchName = (branchId) => {
-    return branchId === 2 ? "Jabodetabek EcoGroceries" : "Yogyakarta EcoGroceries";
-  };
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
+        const Token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost:8000/api/transaction"
+          "http://localhost:8000/api/transaction/branch",
+          {
+            headers: {
+              Authorization: `Bearer ${Token}`,
+            },
+          }
         );
-        setTransactions(response.data.transaction);
+        setTransactions(response.data.transactions);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
@@ -39,14 +40,13 @@ const TransactionList = () => {
     <VStack spacing={4} align="stretch">
       <Box width="100%" overflowX="auto">
         <Text fontSize="2xl" fontWeight="bold">
-          List of All Transactions
+          List of Transactions
         </Text>
         <Table variant="striped" colorScheme="teal" size={"sm"}>
           <Thead>
             <Tr>
               <Th textAlign={"center"}>No.</Th>
               <Th textAlign={"center"}>User</Th>
-              <Th textAlign={"center"}>Branch</Th>
               <Th textAlign={"center"}>User Address</Th>
               <Th textAlign={"center"}>Total Price</Th>
               <Th textAlign={"center"}>Total Quantity</Th>
@@ -57,10 +57,7 @@ const TransactionList = () => {
             {transactions.map((transaction, index) => (
               <Tr key={transaction.id}>
                 <Td textAlign={"center"}>{index + 1}</Td>
-                <Td textAlign={"center"}>{transaction.id_user}</Td>
-                <Td textAlign={"center"}>
-                  {getBranchName(transaction.id_branch)}
-                </Td>
+                <Td textAlign={"center"}>{transaction.User.name}</Td>
                 <Td textAlign={"center"}>{transaction.userAddress}</Td>
                 <Td textAlign={"center"}>{transaction.totPrice}</Td>
                 <Td textAlign={"center"}>{transaction.totQty}</Td>
@@ -78,4 +75,4 @@ const TransactionList = () => {
   );
 };
 
-export default TransactionList;
+export default TransactionListYk;

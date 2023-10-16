@@ -11,18 +11,23 @@ import {
 } from "recharts";
 import axios from "axios";
 
-const TransactionGraph = () => {
+const TransactionGraphJkt = () => {
   const [graphData, setGraphData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const Token = localStorage.getItem("token");
         const response = await axios.get(
-          "http://localhost:8000/api/transaction"
+          "http://localhost:8000/api/transaction/branch",
+          {
+            headers: {
+              Authorization: `Bearer ${Token}`,
+            },
+          }
         );
-        const transactions = response.data.transaction;
+        const transactions = response.data.transactions; // Use response.data.transactions
 
-      
         const aggregatedData = aggregateSalesByDate(transactions);
 
         console.log("Aggregated Data:", aggregatedData);
@@ -52,7 +57,7 @@ const TransactionGraph = () => {
       }
     });
 
-    return Object.values(aggregatedData);
+    return Object.values(aggregatedData).reverse(); // Reverse the data
   };
 
   return (
@@ -61,7 +66,7 @@ const TransactionGraph = () => {
         Total Sales Per Day Graph
       </Heading>
       <Box display={"flex"} justifyContent={"center"}>
-        <LineChart width={1200} height={400} data={graphData.reverse()}> {/* Reverse the data */}
+        <LineChart width={1200} height={400} data={graphData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
           <YAxis />
@@ -80,4 +85,4 @@ const TransactionGraph = () => {
   );
 };
 
-export default TransactionGraph;
+export default TransactionGraphJkt;

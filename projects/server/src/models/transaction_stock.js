@@ -6,17 +6,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // Define associations here
       Transaction_Stock.belongsTo(models.Transaction, { foreignKey: 'id_transaction' });
-      // Transaction_Stock.belongsTo(models.Stock, { foreignKey: 'id_stock' });
     }
   }
 
   Transaction_Stock.init(
     {
-      id: {
+      id : {
         type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false
+        primaryKey: true
       },
       id_transaction: DataTypes.INTEGER,
       id_stock: DataTypes.INTEGER,
