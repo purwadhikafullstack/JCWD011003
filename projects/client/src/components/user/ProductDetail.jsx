@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
+import { useLoaderData, useParams } from 'react-router-dom';
 import {
   Box,
   Heading,
@@ -9,37 +10,79 @@ import {
   Input,
   useColorModeValue,
   useBreakpointValue,
+  useToast,
 } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../Navbar";
-import Footer from "../Footer";
 
-export default function ProductDetail({ onAddToCart }) {
+export default function ProductDetail() {
   const bgColor = useColorModeValue("rgb(255,255,255, 0.9)", "gray.800");
   const { id } = useParams();
-  const [product, setProduct] = useState({});
+  const product = useLoaderData().data;
+  console.log('product',product)
+  const inCart = useLoaderData().qty;
+  const {Product, Stock_Promo} = product
   const [discountPercent, setDiscountPercent] = useState(0); // Initialize as 0
   const [quantity, setQuantity] = useState(1); // Initialize quantity as 1
-
+  const [stock, setStock] = useState(0);
+  const toast = useToast();
   useEffect(() => {
-    const fetchProductDetails = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8000/api/stock/${id}`);
-        const responseData = response.data.data;
-        setProduct(responseData.Product);
-        setDiscountPercent(responseData.discountPercent);
-      } catch (error) {
-        console.error("Error fetching product details:", error);
-      }
-    };
-
-    fetchProductDetails();
-  }, [id]);
+    setDiscountPercent(product.discountPercent);
+    setStock(product.qty)
+    setQuantity(inCart)
+  }, []);
 
   const handleAddToCart = () => {
-    // Pass both the product and quantity to the onAddToCart function
-    onAddToCart(product, quantity);
+    const token = localStorage.getItem("token"); // Get the token from local storage
+
+    // Check if token exists
+    if (!token) {
+      // Handle the case where the token is not available
+      console.error("Token not found in local storage");
+      return;
+    }
+
+    // Define the data to send in the request body
+    const requestData = {
+      stockId: id, // Replace with the actual stockId you want to send
+      quantity: quantity,
+    };
+
+    // Define the headers with the Authorization token
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    // Make the POST request to the API
+    axios
+      .post("http://localhost:8000/api/user/cart", requestData, { headers })
+      .then((response) => {
+        // Handle success response here if needed
+        console.log("Successfully added to cart:", response.data);
+
+        // Display a success toast
+        toast({
+          title: "Item added to cart",
+          description: "The item has been successfully added to your cart.",
+          status: "success",
+          duration: 3000, // Toast message duration in milliseconds
+          isClosable: true,
+          position: "top",
+        });
+      })
+      .catch((error) => {
+        // Handle error response here
+        console.error("Error adding to cart:", error);
+
+        // Display an error toast
+        toast({
+          title: "Error",
+          description: "An error occurred while adding the item to your cart.",
+          status: "error",
+          duration: 3000, // Toast message duration in milliseconds
+          isClosable: true,
+          position: "top",    
+        });
+      });
   };
 
   const formatPriceAsIDR = (price) => {
@@ -48,7 +91,7 @@ export default function ProductDetail({ onAddToCart }) {
       return "";
     }
 
-    const discountedPrice = product.price - (product.price * discountPercent) / 100;
+    const discountedPrice = Product.price - (Product.price * discountPercent) / 100;
 
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -58,19 +101,28 @@ export default function ProductDetail({ onAddToCart }) {
     }).format(discountedPrice);
   };
 
-  // Function to increase the quantity
   const increaseQuantity = () => {
-    setQuantity(quantity + 1);
+    if (quantity < stock) { // Check if quantity is less than available stock
+      setQuantity(quantity + 1);
+    } else {
+      // Display a toast when the user tries to add more than available stock
+      toast({
+        title: "No more stock",
+        description: "The stock is exhausted. You can't add more to your cart.",
+        status: "warning",
+        duration: 3000, // Toast message duration in milliseconds
+        isClosable: true,
+        position: "top",
+      });
+    }
   };
-
-  // Function to decrease the quantity, but not below 1
+  
   const decreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
   };
 
-  // Function to handle input value change
   const handleQuantityChange = (event) => {
     const newValue = parseInt(event.target.value);
     if (!isNaN(newValue) && newValue >= 1) {
@@ -81,79 +133,93 @@ export default function ProductDetail({ onAddToCart }) {
   const numColumns = useBreakpointValue({ base: 1, sm: 1, md: 2, lg: 2, xl: 2 });
   return (
     <Box
-        bg={"teal.400"}
-        bgSize="cover"
-        bgPosition="center"
-        minH="100vh"
-        display="flex"
-        flexDirection="column"
-        color="white"
-        textShadow="0px 2px 4px rgba(0, 0, 0, 0.5)"
-    >
-      <Navbar />
-      <Flex mx={['5','20']} my={['5','10']}
-    //   w="full"
-      bg={bgColor}
-      boxShadow="md"
-      rounded="lg"
-      pos="relative"
-      zIndex={1}
-      flexDirection={{ base: "column", md: "row" }}
-      >
-        <Box boxSize={{ base: "50%", md: "350px" }}>
-          <Image
-            src={`http://localhost:8000/api/${product?.productImg}`}
-            alt={product?.name}
-          />
-        </Box>
-        <Box flex="2" p={[2,4]} maxW='xl' textColor={'black'} mt={{ base: 0, md: 0 }} ml={{ base: 2, md: 4 }}>
-          <Heading fontSize={["md","xl"]}>{product?.name}</Heading>
-          <Text color="gray.500" fontSize={["xs","sm"]} mb={2}>
-            {product.Category?.category}
-          </Text>
-          <Flex>
-            <Text fontWeight={800} fontSize={["md","xl"]} color={"teal"}>
-              {formatPriceAsIDR(product.price)}
-            </Text>
-            <Text color={"red"} fontSize={"xs"}>
-              {discountPercent}%
-            </Text>
-          </Flex>
-          <Text
-            textDecoration={"line-through"}
-            color={"gray.600"}
-            fontSize={"xs"}
-          >
-            {formatPriceAsIDR(product.price)}
-          </Text>
-          <Text fontSize={["sm","lg"]}>{product?.description}</Text>
-          <Flex mt={4}>
-            <Button onClick={decreaseQuantity} colorScheme="teal" size={['xs','sm']}>
-              -
-            </Button>
-            <Input
-              type="number"
-              min="1"
-              value={quantity}
-              onChange={handleQuantityChange}
-              width="50px"
-              textAlign="center"
-              size={['xs','sm']}
-              mx={'0.5'}
-            //   variant='unstyled'
-            />
-            <Button onClick={increaseQuantity} colorScheme="teal" size={['xs','sm']}>
-              +
-            </Button>
-          </Flex>
-          <Flex mt={4}>
-            <Button size={['sm','md']} onClick={handleAddToCart} colorScheme="teal">
-              Add to Cart
-            </Button>
-          </Flex>
-        </Box>
-      </Flex>
-      <Footer />
-    </Box>
+bg={"teal.400"}
+bgSize="cover"
+bgPosition="center"
+minH="100vh"
+display="flex"
+flexDirection="column"
+color="white"
+textShadow="0px 2px 4px rgba(0, 0, 0, 0.5)"
+>
+
+<Flex mx={['5','20']} my={['5','10']}
+//   w="full"
+bg={bgColor}
+boxShadow="md"
+rounded="lg"
+pos="relative"
+zIndex={1}
+flexDirection={{ base: "column", md: "row" }}
+>
+<Box boxSize={{ base: "50%", md: "350px" }}>
+  <Image
+    src={`http://localhost:8000/api/${Product?.productImg}`}
+    alt={Product?.name}
+  />
+</Box>
+<Box flex="2" p={[2,4]} maxW='xl' textColor={'black'} mt={{ base: 0, md: 0 }} ml={{ base: 2, md: 4 }}>
+  <Heading fontSize={["md","xl"]}>{Product?.name}</Heading>
+  <Text color="gray.500" fontSize={["xs","sm"]} mb={2}>
+    {Product.Category?.category}
+  </Text>
+  <Flex>
+    <Text fontWeight={800} fontSize={["md","xl"]} color={"teal"}>
+      {formatPriceAsIDR(Product.price)}
+    </Text>
+    <Text color={"red"} fontSize={"xs"}>
+      {discountPercent}%
+    </Text>
+  </Flex>
+  <Text
+    textDecoration={"line-through"}
+    color={"gray.600"}
+    fontSize={"xs"}
+  >
+    {formatPriceAsIDR(Product.price)}
+  </Text>
+  <Text fontSize={["sm","lg"]}>{Product?.description}</Text>
+  <Flex mt={4}>
+    <Button onClick={decreaseQuantity} colorScheme="teal" size={['xs','sm']}>
+      -
+    </Button>
+    <Input
+      type="number"
+      min="1"
+      value={quantity}
+      onChange={handleQuantityChange}
+      width="50px"
+      textAlign="center"
+      size={['xs','sm']}
+      mx={'0.5'}
+    //   variant='unstyled'
+    />
+    <Button onClick={increaseQuantity} colorScheme="teal" size={['xs','sm']}>
+      +
+    </Button>
+  </Flex>
+  <Flex mt={4}>
+    <Button size={['sm','md']} onClick={handleAddToCart} colorScheme="teal">
+      Add to Cart
+    </Button>
+  </Flex>
+</Box>
+</Flex>
+</Box>
+
   );
+}
+
+export const productDetailsLoader = async ({ params }) => {
+  const { id } = params;
+  const token = localStorage.getItem('token');
+
+  const res = await fetch(`http://localhost:8000/api/stock/${id}`, {
+    method: 'GET',
+    headers: {
+      "Authorization": `Bearer ${token}`
+    },
+  });
+
+  return res.json();
 }
