@@ -94,16 +94,6 @@ const Profile = () => {
                 <MenuDivider />
                   <Text ml={3} as='u' textColor={'black'} fontWeight="400" fontSize={'lg'}>Setting</Text>
                 <MenuItem textColor={'black'}>
-                <Link to="/forgot-password">
-                  <Text fontWeight="300">Forgot Password</Text>
-                </Link>
-                </MenuItem>
-                <MenuItem textColor={'black'}>
-                <Link to="/reset-password/:token">
-                  <Text fontWeight="300">Reset Password</Text>
-                </Link>
-                </MenuItem>
-                <MenuItem textColor={'black'}>
                 <Link to="/changes-password">
                   <Text fontWeight="300">Change Password</Text>
                 </Link>
