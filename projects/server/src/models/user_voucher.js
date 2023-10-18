@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       // Define associations here if needed
       User_Voucher.belongsTo(models.Voucher, { foreignKey: 'id_voucher' });
       User_Voucher.belongsTo(models.User, { foreignKey: 'id_user' });
-      User_Voucher.belongsTo(models.Product, { foreignKey: 'id_product' });
+      // User_Voucher.belongsTo(models.Product, { foreignKey: 'id_product' });
     }
   }
 
@@ -16,7 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       id_voucher: DataTypes.INTEGER,
       id_user: DataTypes.INTEGER,
       isUsed: DataTypes.BOOLEAN,
-      id_product: DataTypes.INTEGER,
       validUntil: DataTypes.DATE,
     },
     {
