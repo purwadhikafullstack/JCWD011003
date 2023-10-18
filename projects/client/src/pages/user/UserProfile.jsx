@@ -226,7 +226,8 @@ export default function UserProfileEdit() {
               <Heading fontSize={{ base: "2xl", sm: "xl" }}>
                 {userData.name}
               </Heading>
-              <Text>Referral Code : {userData.referral}</Text>
+              <Text>Referral Code : {userData.referral}</Text> 
+              <Text>Referred by : {userData.referred_by}</Text>
             </Box>
           </FormControl>
         </Box>
@@ -349,6 +350,7 @@ export default function UserProfileEdit() {
                 {userData.name}
               </Heading>
               <Text>Referral Code : {userData.referral}</Text>
+              <Text>Referred by : {userData.referred_by}</Text>
             </Box>
           </FormControl>
         </Box>
