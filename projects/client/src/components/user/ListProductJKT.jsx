@@ -32,6 +32,7 @@ export default function Product() {
   const [category, setCategory] = useState("");
   const [name, setName] = useState("");
   const [totalPages, setTotalPages] = useState(0);
+
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
@@ -48,7 +49,6 @@ export default function Product() {
   const fetchProduct = async () => {
     try {
       let apiUrl = `http://localhost:8000/api/stock/?page=${currentPage}&id_branch=2`;
-
       if (searchQuery) {
         apiUrl += `&name=${searchQuery}`;
       }
@@ -61,7 +61,6 @@ export default function Product() {
       if (name) {
         apiUrl += `&orderByName=${name}`;
       }
-
       const response = await axios.get(apiUrl);
       console.log('response', response)
       const jakartaStock = response.data.data
@@ -73,7 +72,6 @@ export default function Product() {
 
   useEffect(() => {
     fetchProduct();
-
   }, [currentPage, price, category, name, searchQuery]);
 
   const handleSortPrice = (e) => {
@@ -97,14 +95,14 @@ export default function Product() {
   };
 
   const [selectedProduct, setSelectedProduct] = useState(null);
-  
+
   const handleCloseProductDetail = () => {
     setSelectedProduct(null);
   };
 
   return (
     <Box minW={["","1190"]} maxW={["","1190"]}>
-      <Box width={["91%","97%"]} ml={'4'}>
+      <Box width={["91%","97.2%"]} ml={'4'}>
         <InputGroup borderRadius={"full"} size={["xs","sm"]}>
           <InputLeftElement
             pointerEvents="none"
@@ -141,16 +139,16 @@ export default function Product() {
         setName={setName}
         handleSearch={handleSearch}
       />
-      <Flex w="100%" gap={6} wrap="wrap" ml={4} mb={4}>
+      <Flex w="100%" columnGap={[9,6]} rowGap={[4,6]} wrap="wrap" pl={4} mb={4}>
         {product.map((product, index) => (
           <Box
             key={index}
             align={"center"}
             role="group"
-            p={4}
             maxW={{ base: "43%", md: "212px" }}
             w="full"
-            bg={bgColor}
+            pointerEvents={product.qty===0 ? "none":true}
+            bg={product.qty===0 ? "blackAlpha.300":bgColor}
             boxShadow="md"
             rounded="lg"
             pos="relative"
@@ -163,22 +161,8 @@ export default function Product() {
                 mt={-8}
                 pos="relative"
                 height={["80px","120px"]}
-                _after={{
-                  transition: "all .3s ease",
-                  content: '""',
-                  w: "full",
-                  h: "full",
-                  pos: "absolute",
-                  top: 2,
-                  left: 0,
-                  backgroundImage: `url(http://localhost:8000/api/${product.Product.productImg})`,
-                  filter: "blur(10px)",
-                  zIndex: -1,
-                }}
-                _groupHover={{
-                  _after: {
-                    filter: "blur(15px)",
-                  },
+                style={{
+                  filter: product.qty === 0 ? "blur(7px)" : "none",
                 }}
               >
                 <Image
@@ -232,7 +216,7 @@ export default function Product() {
                 fontSize={'small'}
                 variant={'ghost'}
                 _hover={{ backgroundColor: 'teal.200' }} 
-              > Shop now
+              > {product.qty===0 ? "Sold Out":"Shop Now"}
                 <MdShoppingCartCheckout color="black" size={15} />
               </Button>
             </Link>

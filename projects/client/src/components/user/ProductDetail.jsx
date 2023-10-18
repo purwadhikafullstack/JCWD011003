@@ -9,7 +9,6 @@ import {
   Button,
   Input,
   useColorModeValue,
-  useBreakpointValue,
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -18,12 +17,12 @@ export default function ProductDetail() {
   const bgColor = useColorModeValue("rgb(255,255,255, 0.9)", "gray.800");
   const { id } = useParams();
   const product = useLoaderData().data;
-  console.log('product',product)
   const inCart = useLoaderData().qty;
   const {Product, Stock_Promo} = product
   const [discountPercent, setDiscountPercent] = useState(0); // Initialize as 0
   const [quantity, setQuantity] = useState(1); // Initialize quantity as 1
   const [stock, setStock] = useState(0);
+  const [qty, setqty] = useState(0);
   const toast = useToast();
   useEffect(() => {
     setDiscountPercent(product.discountPercent);
@@ -130,82 +129,83 @@ export default function ProductDetail() {
     }
   };
 
-  const numColumns = useBreakpointValue({ base: 1, sm: 1, md: 2, lg: 2, xl: 2 });
   return (
     <Box
-bg={"teal.400"}
-bgSize="cover"
-bgPosition="center"
-minH="100vh"
-display="flex"
-flexDirection="column"
-color="white"
-textShadow="0px 2px 4px rgba(0, 0, 0, 0.5)"
->
+        bg={"teal.400"}
+        bgSize="cover"
+        bgPosition="center"
+        display="flex"
+        flexDirection="column"
+        // h={''}
+        >
 
-<Flex mx={['5','20']} my={['5','10']}
-//   w="full"
-bg={bgColor}
-boxShadow="md"
-rounded="lg"
-pos="relative"
-zIndex={1}
-flexDirection={{ base: "column", md: "row" }}
->
-<Box boxSize={{ base: "50%", md: "350px" }}>
-  <Image
-    src={`http://localhost:8000/api/${Product?.productImg}`}
-    alt={Product?.name}
-  />
-</Box>
-<Box flex="2" p={[2,4]} maxW='xl' textColor={'black'} mt={{ base: 0, md: 0 }} ml={{ base: 2, md: 4 }}>
-  <Heading fontSize={["md","xl"]}>{Product?.name}</Heading>
-  <Text color="gray.500" fontSize={["xs","sm"]} mb={2}>
-    {Product.Category?.category}
-  </Text>
-  <Flex>
-    <Text fontWeight={800} fontSize={["md","xl"]} color={"teal"}>
-      {formatPriceAsIDR(Product.price)}
-    </Text>
-    <Text color={"red"} fontSize={"xs"}>
-      {discountPercent}%
-    </Text>
-  </Flex>
-  <Text
-    textDecoration={"line-through"}
-    color={"gray.600"}
-    fontSize={"xs"}
-  >
-    {formatPriceAsIDR(Product.price)}
-  </Text>
-  <Text fontSize={["sm","lg"]}>{Product?.description}</Text>
-  <Flex mt={4}>
-    <Button onClick={decreaseQuantity} colorScheme="teal" size={['xs','sm']}>
-      -
-    </Button>
-    <Input
-      type="number"
-      min="1"
-      value={quantity}
-      onChange={handleQuantityChange}
-      width="50px"
-      textAlign="center"
-      size={['xs','sm']}
-      mx={'0.5'}
-    //   variant='unstyled'
-    />
-    <Button onClick={increaseQuantity} colorScheme="teal" size={['xs','sm']}>
-      +
-    </Button>
-  </Flex>
-  <Flex mt={4}>
-    <Button size={['sm','md']} onClick={handleAddToCart} colorScheme="teal">
-      Add to Cart
-    </Button>
-  </Flex>
-</Box>
-</Flex>
-</Box>
+        <Flex 
+        mx={['5','20']} 
+        my={['5','10']}
+        bg={bgColor}
+        boxShadow="md"
+        rounded="lg"
+        pos="relative"
+        zIndex={1}
+        flexDirection={{ base: "column", md: "row" }}
+        >
+        <Box boxSize={{ base: "50%", md: "350px" }}>
+          <Image
+            src={`http://localhost:8000/api/${Product?.productImg}`}
+            alt={Product?.name}
+          />
+        </Box>
+        <Box flex="2" p={[2,4]} maxW='xl' textColor={'black'} mt={{ base: 0, md: 0 }} ml={{ base: 2, md: 4 }}>
+          <Heading fontSize={["md","xl"]}>{Product?.name}</Heading>
+          <Text color="gray.500" fontSize={["xs","sm"]}>
+            {Product.Category?.category}
+          </Text>
+          <Text color="red" fontSize={["xs","sm"]} mb={2}>
+            Stock : {product.qty}
+          </Text>
+          <Flex>
+            <Text fontWeight={800} fontSize={["md","xl"]} color={"teal"}>
+              {formatPriceAsIDR(Product.price)}
+            </Text>
+            <Text color={"red"} fontSize={"xs"}>
+              {discountPercent}%
+            </Text>
+          </Flex>
+          <Text
+            textDecoration={"line-through"}
+            color={"gray.600"}
+            fontSize={"xs"}
+          >
+            {formatPriceAsIDR(Product.price)}
+          </Text>
+          <Text fontSize={["sm","lg"]}>{Product?.description}</Text>
+          <Flex mt={4}>
+            <Button onClick={decreaseQuantity} colorScheme="teal" size={['xs','sm']}>
+              -
+            </Button>
+            <Input
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={handleQuantityChange}
+              width="50px"
+              textAlign="center"
+              size={['xs','sm']}
+              mx={'0.5'}
+            //   variant='unstyled'
+            />
+            <Button onClick={increaseQuantity} colorScheme="teal" size={['xs','sm']}>
+              +
+            </Button>
+          </Flex>
+          <Flex mt={4}>
+            <Button size={['sm','md']} onClick={handleAddToCart} colorScheme="teal">
+              Add to Cart
+            </Button>
+          </Flex>
+        </Box>
+        </Flex>
+        </Box>
 
   );
 }

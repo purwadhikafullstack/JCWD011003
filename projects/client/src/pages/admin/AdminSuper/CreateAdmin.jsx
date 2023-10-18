@@ -30,7 +30,6 @@ const CreateAdmin = ({ isOpen, onClose, onCreateSuccess }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     // Email validation using a regular expression
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isEmailValid = emailRegex.test(email);
@@ -50,12 +49,11 @@ const CreateAdmin = ({ isOpen, onClose, onCreateSuccess }) => {
     };
     try {
       const response = axios.post('http://localhost:8000/api/admin/admin', requestBody);
-      console.log('Cashier created:', response.data);
-
       setUsername('');
       setEmail('');
       setPassword('');
       onClose();
+      onCreateSuccess();
       toast({
         title: "Created Admin Branch",
         description: "The admin account has been successfully created.",
@@ -63,7 +61,9 @@ const CreateAdmin = ({ isOpen, onClose, onCreateSuccess }) => {
         duration: 3000,
         isClosable: true,
       });
-      onCreateSuccess();
+      setTimeout(()=>{
+        window.location.reload();
+      }, 2000)
     } catch (error) {
       console.log(error);
       toast({
@@ -81,7 +81,7 @@ const CreateAdmin = ({ isOpen, onClose, onCreateSuccess }) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} blockScrollOnMount={false} isCentered>
+      <Modal size={{ base: "xs", sm: "sm" }} isOpen={isOpen} onClose={onClose} blockScrollOnMount={false} isCentered>
         <ModalOverlay />
         <ModalContent bgColor={'rgba(0,0,0, 0.8)'} textColor="white">
           <ModalHeader>Create Cashier</ModalHeader>

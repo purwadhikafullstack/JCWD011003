@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       id_stock_promo: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        defaultValue: 1,
       },
       isActive: {
         type: DataTypes.BOOLEAN,

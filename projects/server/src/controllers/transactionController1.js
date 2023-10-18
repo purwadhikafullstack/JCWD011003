@@ -7,6 +7,7 @@ const Transaction_Status = db.Transaction_Status;
 const Stock_History = db.Stock_History;
 const Stock = db.Stock;
 const Branch = db.Branch;
+const Op = db.Sequelize.Op;
 
 async function getTransactionUser (req, res) {
     try {
@@ -80,6 +81,9 @@ async function getAllTransactionByBranch(req, res) {
           model: User,
           attributes: ['id', 'name'],
         },
+        {
+          model: Transaction_Stock
+        }
       ],
       order: [[sortBy, sortOrder]], // Specify the sorting criteria
       limit: limit,
@@ -126,10 +130,13 @@ async function getAllTransaction (req, res) {
       };
     }
 
-    const transactions = await Transaction.findAll(query,{
-      include: [{model: Transaction_Status, attributes:['status']}, {model: User, attributes:['id', 'name']}, {model: Branch, attributes:['id', 'name']}]
+    const transactions = await Transaction.findAll({
+      where: {
+        id: { [Op.ne]: null },
+      },
+      include: [{model: Transaction_Status, attributes:['status']}, {model: User, attributes:['id', 'name']}, {model: Branch, attributes:['id', 'name']}, {model: Transaction_Stock}]
     });
-
+    
     res.status(200).json({transaction:transactions});
   } catch (error) {
     console.error('Error:', error);
