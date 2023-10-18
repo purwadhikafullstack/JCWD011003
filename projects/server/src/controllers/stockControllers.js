@@ -277,7 +277,7 @@ const stockControllers = {
       const orderByName = req.query.orderByName;
       const orderByPrice = req.query.orderByPrice;
       const name = req.query.name;
-      const id_branch = req.query.id_branch
+      const id_branch = req.query.id_branch;
 
       const offset = (page - 1) * pageSize;
       const limit = pageSize;
@@ -295,11 +295,16 @@ const stockControllers = {
       }
       if (orderByPrice) {
         order.push(["Product", "price", orderByPrice]);
-      } if (name) {
-        whereClause["$Product.name$"] = { [Op.like]: `%${name}%` };
-      } if (id_branch) {
-        whereClause ["$Branch.id$"] = id_branch;
       }
+      if (name) {
+        whereClause["$Product.name$"] = { [Op.like]: `%${name}%` };
+      }
+      if (id_branch) {
+        whereClause["$Branch.id$"] = id_branch;
+      }
+
+      // Add a condition for isActive category
+      whereClause["$Product.Category.isActive$"] = true; // Assuming the field is called 'isActive'
 
       const { count, rows: allStock } = await Stock.findAndCountAll({
         include: [
@@ -309,7 +314,7 @@ const stockControllers = {
             include: [
               {
                 model: Category,
-                attributes: ["id", "category"],
+                attributes: ["id", "category", "isActive"], // Include 'isActive' in the attributes
               },
             ],
           },
@@ -349,6 +354,7 @@ const stockControllers = {
       return res.status(500).json({ error: "Internal server error" });
     }
   },
+
 
 
   

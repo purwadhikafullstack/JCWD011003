@@ -71,7 +71,6 @@ const AdminList = () => {
       const response = await axios.get("http://localhost:8000/api/admin/admin");
       setCashiers(response.data);
       onCreateCashierClose();
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -110,12 +109,10 @@ const AdminList = () => {
     onEditCashierClose();
   };
 
-  const handleCreateAdminSuccess = async () => {
+  const handleCreateAdminSuccess = () => {
     fetchCashiers(); 
     onCreateCashierClose();
   };
-  
-
 
   return (
     <Box maxW="10xl" px={{ base: 5, md: 20 }} py={"6"} maxH="730px" overflowY="auto">

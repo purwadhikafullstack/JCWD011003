@@ -26,7 +26,6 @@ import { Link } from "react-router-dom";
 export default function Product() {
   const bgColor = useColorModeValue("rgb(255,255,255, 0.9)", "gray.800");
   const [product, setProduct] = useState([]);
-  const [qty, setqty] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState([]);
   const [price, setPrice] = useState("");
@@ -63,7 +62,6 @@ export default function Product() {
         apiUrl += `&orderByName=${name}`;
       }
       const response = await axios.get(apiUrl);
-      console.log('response', response)
       const yogyakartaStock = response.data.data
     setProduct(yogyakartaStock);
     setTotalPages(response.data.totalPages);
@@ -146,7 +144,6 @@ export default function Product() {
             key={index}
             align={"center"}
             role="group"
-            // p={4}
             maxW={{ base: "43%", md: "212px" }}
             w="full"
             pointerEvents={product.qty===0 ? "none":true}
@@ -163,23 +160,6 @@ export default function Product() {
                 mt={-8}
                 pos="relative"
                 height={["80px","120px"]}
-                _after={{
-                  transition: "all .3s ease",
-                  content: '""',
-                  w: "full",
-                  h: "full",
-                  pos: "absolute",
-                  top: 2,
-                  left: 0,
-                  backgroundImage: `url(http://localhost:8000/api/${product.Product.productImg})`,
-                  filter: "blur(10px)",
-                  zIndex: -1,
-                }}
-                _groupHover={{
-                  _after: {
-                    filter: "blur(15px)",
-                  },
-                }}
                 style={{
                   filter: product.qty === 0 ? "blur(7px)" : "none",
                 }}
@@ -235,7 +215,7 @@ export default function Product() {
                 fontSize={'small'}
                 variant={'ghost'}
                 _hover={{ backgroundColor: 'teal.200' }} 
-              > Shop now
+              > {product.qty===0 ? "Sold Out":"Shop Now"}
                 <MdShoppingCartCheckout color="black" size={15} />
               </Button>
             </Link>

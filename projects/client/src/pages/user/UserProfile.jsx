@@ -16,6 +16,7 @@ import {
   VStack,
   Button,
   Box,
+  Text,
   useMediaQuery,
 } from "@chakra-ui/react";
 import { RiImageEditFill } from "react-icons/ri";
@@ -26,8 +27,6 @@ import PersonalData from "../../components/user/PersonalData";
 import Address from "../../components/user/Address";
 import HistoryOrder from "../../components/user/HistoryOrder";
 import Discount from "../../components/user/Discount";
-import Footer from "../../components/Footer";
-import Navbar from "../../components/Navbar";
 import axios from "axios";
 import Swal from "sweetalert2"
 
@@ -227,7 +226,7 @@ export default function UserProfileEdit() {
               <Heading fontSize={{ base: "2xl", sm: "xl" }}>
                 {userData.name}
               </Heading>
-              {/* Add more user data as needed */}
+              <Text>Referral Code : {userData.referral}</Text>
             </Box>
           </FormControl>
         </Box>
@@ -349,11 +348,11 @@ export default function UserProfileEdit() {
               <Heading fontSize={{ base: "2xl", sm: "xl" }}>
                 {userData.name}
               </Heading>
+              <Text>Referral Code : {userData.referral}</Text>
             </Box>
           </FormControl>
         </Box>
        
-
         <Box
           w={"full"}
           maxW={"xl"}
