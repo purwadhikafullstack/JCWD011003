@@ -18,7 +18,11 @@ const TransactionGraph = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/transaction"
+          "http://localhost:8000/api/transaction", {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
         );
         const transactions = response.data.transaction;
 

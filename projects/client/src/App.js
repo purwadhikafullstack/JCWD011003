@@ -19,6 +19,7 @@ import LoginAdminForm from "./pages/admin/LoginAdminForm";
 import AdminLandingSuper from "./pages/admin/AdminSuper/AdminLandingSuper";
 import AdminLandingYogyakarta from "./pages/admin/AdminBranch/TokoYK/AdminLandingYogyakarta";
 import AdminLandingJabodetabek from "./pages/admin/AdminBranch/TokoJabodetabek/AdminLandingJabodetabek";
+import TransactionDetails, {currentTransactionLoader} from "./pages/admin/TransactionDetails";
 
 //User Pages
 import LoginForm from "./pages/user/LoginForm";
@@ -39,10 +40,13 @@ import Checkout from "./pages/user/Checkout";
 import RootLayout from "./layouts/RootLayouts";
 import ShopLayout from "./layouts/ShopLayout";
 import AdminLayout from "./layouts/AdminLayout";
+import TransactionDetailsSuper, { currentTransactionSuperLoader } from "./pages/admin/AdminSuper/TransactionDetailsSuper";
 
 function checkUserRole() {
   const token = localStorage.getItem('token');
-
+  if (!token) {
+    return 'guest'; // or whatever role you want to assign to non-authenticated users
+  }
   const decoded = jwt_decode(token);
   if (decoded.adminSuper === true) return 'superAdmin';
   if (decoded.adminSuper === false) return 'admin';
@@ -54,12 +58,13 @@ function ProtectedAdminRoute({ children, allowedRoles }) {
   const role = checkUserRole();
 
   useEffect(() => {
-    if (!allowedRoles.includes(role)) {
-      navigate("/");
-    } 
-    console.log('role in ProtectedAdminRoute', role);
-  }, [role, navigate]);
-
+    if (role === 'guest') {
+      navigate('/'); // or wherever you want to redirect non-authenticated users
+    } else if (!allowedRoles.includes(role)) {
+      navigate('/admin');
+    }
+    console.log('role in ProtectedRoute', role);
+  }, [role, navigate, allowedRoles]);
   return children;
 }
 
@@ -68,10 +73,13 @@ function ProtectedRoute({ children, allowedRoles }) {
   const role = checkUserRole();
 
   useEffect(() => {
-    if (!allowedRoles.includes(role)) {
-      navigate('/admin');
+    if (role === 'guest') {
+      navigate('/'); // or wherever you want to redirect non-authenticated users
+    } else if (!allowedRoles.includes(role)) {
+      navigate('/');
     }
     console.log('role in ProtectedRoute', role);
+    
   }, [role, navigate, allowedRoles]);
 
   return children;
@@ -104,6 +112,8 @@ const router = createBrowserRouter(
         <Route path="jkt" element={<ProtectedAdminRoute allowedRoles={['admin']}><AdminLandingJabodetabek /></ProtectedAdminRoute>}/>
         <Route path="yk" element={<ProtectedAdminRoute allowedRoles={['admin']}><AdminLandingYogyakarta /></ProtectedAdminRoute>}/>
         <Route path="super" element={<ProtectedAdminRoute allowedRoles={['superAdmin']}><AdminLandingSuper /></ProtectedAdminRoute>}/>
+        <Route path="super/:id" element={<ProtectedAdminRoute allowedRoles={['superAdmin']}><TransactionDetailsSuper /></ProtectedAdminRoute>}loader={currentTransactionSuperLoader}/>
+        <Route path=":id" element={<ProtectedAdminRoute allowedRoles={['admin', 'superAdmin']}><TransactionDetails /></ProtectedAdminRoute>}loader={currentTransactionLoader}/>
       </Route>
       <Route path="*" element={<NotFound404 />} />
   </Route>

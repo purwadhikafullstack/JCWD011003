@@ -15,6 +15,7 @@ import {
 
 const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
+  const token = localStorage.getItem('token')
 
   const getBranchName = (branchId) => {
     return branchId === 2
@@ -26,9 +27,14 @@ const TransactionList = () => {
     const fetchTransactions = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/transaction"
+          "http://localhost:8000/api/transaction", {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
         );
         setTransactions(response.data.transaction);
+        console.log('tr',response)
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }

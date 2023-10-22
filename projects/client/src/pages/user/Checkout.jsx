@@ -35,6 +35,7 @@ function Checkout() {
   const [selectedShippingOption, setSelectedShippingOption] = useState('');
   const [selectedService, setSelectedService] = useState(0);
   const [service, setService] = useState([]);
+  const [showUnpaidMessage, setShowUnpaidMessage] = useState(false);
   // const [isLargerThanMobile] = useMediaQuery("(min-width: 600px)"); 
   const token = localStorage.getItem('token');
   const authorizationHeader = token ? `Bearer ${token}` : '';
@@ -64,6 +65,10 @@ function Checkout() {
             Authorization: authorizationHeader,
           },
         });
+        
+        if (response.data.message === 'you have unpaid transaction' && response.data.value === false) {
+          setShowUnpaidMessage(true);
+        }
         setResponse2(response.data);
         console.log("res2", response);
         const numb = response.data[0].Stock.id_branch;
@@ -86,6 +91,10 @@ function Checkout() {
             Authorization: authorizationHeader,
           },
         });
+        
+        if (response.data.message === 'you have unpaid transaction' && response.data.value === false) {
+          setShowUnpaidMessage(true);
+        }
         setResponse1(response.data);
         updateShip({weight: response.data.totWeight})
         // updateBody({totWeight:response.data.totWeight, totPrice: response.data.totPrice, totQty: response.data.totQty, totDiscount: response.data.totDiscount}) 
@@ -208,132 +217,149 @@ function Checkout() {
   };  
   
   return (  
-    <Box flex="1" p="4" d="flex" flexDirection="column" justifyContent="space-between">
-      {(!response1 || !response2 || Object.keys(response1).length === 0 || response2.length === 0) ? (
-      <Box flex="1" p="4">
-        <Heading as="h2" size="md" mb="2">
-          Your cart is empty, start shopping here
-        </Heading>
-        <Button colorScheme="teal" onClick={() => navigate('/shop')}>
-          Start Shopping
-        </Button>
-      </Box>
-      ) : (
-        <>
-    <Box flex="1" p="4">
-  <Heading as="h2" size="md" mb="2">
-    Second JSON Response:
-  </Heading>
-  {response2.slice(0, showMore ? response2.length : 1).map((item, index) => (
-    <Box key={index} mb="4">
-      <Text>Item {item.Stock.Product.name}</Text>
-      <Text>Price: {item.price}</Text>
-      {/* Add more fields as needed */}
-    </Box>
-  ))}
-
-  {response2.length > 1 && (
-    <Button onClick={toggleShowMore} size="sm" colorScheme="teal">
-      {showMore ? 'Show Less' : 'Show More'}
+    <>      
+    {showUnpaidMessage ?   (
+        <Box flex="1" p="4" d="flex" flexDirection="column" justifyContent="space-between">
+          <Heading as="h2" size="md" mb="2">
+        Your order is unpaid. Please complete the payment.
+      </Heading>
+      <Button colorScheme="teal" onClick={() => {navigate('/payment')}}>
+        Complete Payment
+      </Button>
+          </Box>
+      ): (
+        <Box flex="1" p="4" d="flex" flexDirection="column" justifyContent="space-between">
+          {(!response1 || !response2 || Object.keys(response1).length === 0 || response2.length === 0) ? (
+  <Box flex="1" p="4">
+    <Heading as="h2" size="md" mb="2">
+      Your cart is empty, start shopping here
+    </Heading>
+    <Button colorScheme="teal" onClick={() => navigate('/shop')}>
+      Start Shopping
     </Button>
-  )}
+  </Box>
+  ) : (
+
+    <>
+<Box flex="1" p="4">
+<Heading as="h2" size="md" mb="2">
+Cart Items:
+</Heading>
+{response2.slice(0, showMore ? response2.length : 1).map((item, index) => (
+<Box key={index} mb="4">
+  <Text>Item {item.Stock.Product.name}</Text>
+  <Text>Price: {item.price}</Text>
+  {/* Add more fields as needed */}
 </Box>
-    <Box flex="1" p="4">
-  <Heading as="h2" size="md" mb="2">First JSON Response:</Heading>
-  <Text> Total Price: {response1.totPrice}</Text>
-  <Text> Total Items: {response1.totQty}</Text>
-  <Text> Total Weight: {response1.totWeight}</Text>
-  <Text> Total Shipping Cost: {selectedService}</Text>
-  <Text> Total Product Discount: {response1.totDiscount}</Text>
-  <br />
-  <Flex direction="column" justifyContent="space-between" height="100%">
-    <Box>
-      {addresses.length > 0 && (
-        <Box border="1px" borderColor="black" borderRadius="md" p="2">
-          <Heading as="h2" size="md" mb="2">Select Shipment Address:</Heading>
-          <Select
-            value={selectedAddress}
-            onChange={handleAddressChange}
-            mt="4"
-          >
-            <option value="" disabled>
-              Select shipment address
-            </option>
-            {addresses.map((address) => (
-              <option key={address.id} value={address.userCity} data-user-address={address.userAddress}>
-                {`${address.userName} - ${address.userAddress}`}
-              </option>
-            ))}
-          </Select>
-        </Box>
-      )}
-       {selectedAddress && (
-  <>
+))}
+
+{response2.length > 1 && (
+<Button onClick={toggleShowMore} size="sm" colorScheme="teal">
+  {showMore ? 'Show Less' : 'Show More'}
+</Button>
+)}
+</Box>
+<Box flex="1" p="4">
+<Heading as="h2" size="md" mb="2">Cart:</Heading>
+<Text> Total Price: {response1.totPrice}</Text>
+<Text> Total Items: {response1.totQty}</Text>
+<Text> Total Weight: {response1.totWeight}</Text>
+<Text> Total Shipping Cost: {selectedService}</Text>
+<Text> Total Product Discount: {response1.totDiscount}</Text>
+<br />
+<Flex direction="column" justifyContent="space-between" height="100%">
+<Box>
+  {addresses.length > 0 && (
     <Box border="1px" borderColor="black" borderRadius="md" p="2">
-      <Heading as="h2" size="md" mb="2">Shipping Options:</Heading>
+      <Heading as="h2" size="md" mb="2">Select Shipment Address:</Heading>
       <Select
-        value={selectedShippingOption}
-        onChange={handleShippingOptionChange}
+        value={selectedAddress}
+        onChange={handleAddressChange}
         mt="4"
-        width="200px"
       >
-        <option value="">Select a courier</option>
-        <option value="jne">JNE</option>
-        <option value="pos">POS</option>
-        <option value="tiki">TIKI</option>
-      </Select>
-    </Box>
-    <Box border="1px" borderColor="black" borderRadius="md" p="2">
-      <Heading as="h2" size="md" mb="2">Service Options:</Heading>
-      <Select
-        value={selectedService}
-        onChange={handleServiceChange}
-        mt="4"
-        width="200px"
-      >
-        <option value="">
-          {service.length === 0 ? 'Choose a courier first' : 'Select a service'}
+        <option value="" disabled>
+          Select shipment address
         </option>
-        {service.map((serv) => (
-          <option key={serv.service} value={serv.cost[0].value} name={serv.description}>
-            {serv.service}
+        {addresses.map((address) => (
+          <option key={address.id} value={address.userCity} data-user-address={address.userAddress}>
+            {`${address.userName} - ${address.userAddress}`}
           </option>
         ))}
       </Select>
     </Box>
-  </>
+  )}
+   {selectedAddress && (
+<>
+<Box border="1px" borderColor="black" borderRadius="md" p="2">
+  <Heading as="h2" size="md" mb="2">Shipping Options:</Heading>
+  <Select
+    value={selectedShippingOption}
+    onChange={handleShippingOptionChange}
+    mt="4"
+    width="200px"
+  >
+    <option value="">Select a courier</option>
+    <option value="jne">JNE</option>
+    <option value="pos">POS</option>
+    <option value="tiki">TIKI</option>
+  </Select>
+</Box>
+<Box border="1px" borderColor="black" borderRadius="md" p="2">
+  <Heading as="h2" size="md" mb="2">Service Options:</Heading>
+  <Select
+    value={selectedService}
+    onChange={handleServiceChange}
+    mt="4"
+    width="200px"
+  >
+    <option value="">
+      {service.length === 0 ? 'Choose a courier first' : 'Select a service'}
+    </option>
+    {service.map((serv) => (
+      <option key={serv.service} value={serv.cost[0].value} name={serv.description}>
+        {serv.service}
+      </option>
+    ))}
+  </Select>
+</Box>
+</>
 )}
-    </Box>
-    <Box display="flex" justifyContent="flex-end" mt="4">
-      <Button colorScheme="teal" onClick={handleCheckout}>
-        Checkout
-      </Button>
-    </Box>
-  </Flex>
+</Box>
+<Box display="flex" justifyContent="flex-end" mt="4">
+  <Button colorScheme="teal" onClick={handleCheckout}>
+    Checkout
+  </Button>
+</Box>
+</Flex>
 </Box>
 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-  <ModalOverlay />
-  <ModalContent>
-    <ModalHeader>Are you sure you want to checkout?</ModalHeader>
-    <ModalCloseButton />
-    <ModalBody>
-      {/* Additional information or confirmation message can be added here */}
-    </ModalBody>
-    <ModalFooter>
-      <Button colorScheme="teal" mr={3} onClick={handleCheckoutConfirmation}>
-        Yes
-      </Button>
-      <Button colorScheme="gray" onClick={() => setIsModalOpen(false)}>
-        No
-      </Button>
-    </ModalFooter>
-  </ModalContent>
+<ModalOverlay />
+<ModalContent>
+<ModalHeader>Are you sure you want to checkout?</ModalHeader>
+<ModalCloseButton />
+<ModalBody>
+  {/* Additional information or confirmation message can be added here */}
+</ModalBody>
+<ModalFooter>
+  <Button colorScheme="teal" mr={3} onClick={handleCheckoutConfirmation}>
+    Yes
+  </Button>
+  <Button colorScheme="gray" onClick={() => setIsModalOpen(false)}>
+    No
+  </Button>
+</ModalFooter>
+</ModalContent>
 </Modal>
 </>
-      )}
-  </Box>
+  )}
+        </Box>
   
+      )}
+     </>
+
   );
 }
 
 export default Checkout;
+
+

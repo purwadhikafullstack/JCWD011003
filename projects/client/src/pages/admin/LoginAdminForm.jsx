@@ -91,8 +91,8 @@ const LoginAdminForm = () => {
                     email: values.email,
                     password: values.password,
                   }
-                )
-                .then(function (response) {
+                  )
+                  .then(function (response) {
                   localStorage.setItem("token", response.data.token);
                   handleLoginSuccess();
                 //   dispatch(loginSuccess(response.data.token))

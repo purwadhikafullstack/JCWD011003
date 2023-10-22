@@ -1,7 +1,7 @@
 import { Box, Flex, Icon, Link, Text, VStack } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import StockHistoryJKT from './StockHistoryJKT'
 import ProductJKTManagement from "./ProductJKTManagement";
 import CategoryJKTManagement from "./CategoryJKTManagement";
 import TransactionOrderJKT from "./TransactionOrderJKT";
@@ -40,7 +40,8 @@ const AdminLandingJabodetabek = () => {
         return <VoucherPromo />;
       case "report":
         return <SalesJKTReport />;
-
+        case "history":
+          return <StockHistoryJKT/>;
       default:
         return null;
     }
@@ -226,6 +227,33 @@ const AdminLandingJabodetabek = () => {
                     ml={2}
                   >
                     Report Management
+                  </Text>
+                </Box>
+              </Link>
+              <Link
+                as={"button"}
+                colorScheme={"teal"}
+                onClick={() => setActivePage("history")}
+              >
+                <Box
+                  display={"flex"}
+                  alignItems={"center"}
+                  justifyContent={"flex-start"}
+                  p={"4"}
+                  bg={"teal.800"}
+                  _hover={{ bg: "teal.600" }}
+                >
+                  <Icon
+                    as={TbReportAnalytics}
+                    w={{ base: 4, md: 6 }}
+                    h={{ base: 4, md: 6 }}
+                  />
+                  <Text
+                    fontSize={{ base: "lg", md: "18" }}
+                    fontWeight="bold"
+                    ml={2}
+                  >
+                    Stock History
                   </Text>
                 </Box>
               </Link>

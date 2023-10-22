@@ -2,7 +2,7 @@ import { Box, Flex, Icon, Link, Text, VStack } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
+import StockHistoryYK from "./StockHistoryYK"
 import ProductYKManagement from "./ProductYKManagement";
 import CategoryYKManagement from "./CategoryYKManagement";
 import StockProductYKManagement from "./StockProductYKManagement";
@@ -35,7 +35,8 @@ const AdminLandingYogyakarta = () => {
         return <VoucherPromo />;
       case "report":
         return <SalesYKReport />;
-
+        case "history":
+          return <StockHistoryYK/>;
       default:
         return null;
     }
@@ -221,6 +222,33 @@ const AdminLandingYogyakarta = () => {
                     ml={2}
                   >
                     Report Management
+                  </Text>
+                </Box>
+              </Link>
+              <Link
+                as={"button"}
+                colorScheme={"teal"}
+                onClick={() => setActivePage("history")}
+              >
+                <Box
+                  display={"flex"}
+                  alignItems={"center"}
+                  justifyContent={"flex-start"}
+                  p={"4"}
+                  bg={"teal.800"}
+                  _hover={{ bg: "teal.600" }}
+                >
+                  <Icon
+                    as={TbReportAnalytics}
+                    w={{ base: 4, md: 6 }}
+                    h={{ base: 4, md: 6 }}
+                  />
+                  <Text
+                    fontSize={{ base: "lg", md: "18" }}
+                    fontWeight="bold"
+                    ml={2}
+                  >
+                    Stock History
                   </Text>
                 </Box>
               </Link>

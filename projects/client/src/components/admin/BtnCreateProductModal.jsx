@@ -100,6 +100,7 @@ const BtnCreateProductModal = () => {
       .get("http://localhost:8000/api/category")
       .then((response) => {
         setCategories(response.data.data);
+        console.log(response)
       })
       .catch((error) => {
         console.error("Error fetching categories:", error);
