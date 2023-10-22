@@ -206,9 +206,8 @@ const handleAddToCart = () => {
   return (
     <Box
 bg={"teal.400"}
-bgSize="cover"
 bgPosition="center"
-minH="100vh"
+// h="64vh"
 display="flex"
 flexDirection="column"
 color="white"
@@ -220,7 +219,6 @@ textShadow="0px 2px 4px rgba(0, 0, 0, 0.5)"
 bg={bgColor}
 boxShadow="md"
 rounded="lg"
-pos="relative"
 zIndex={1}
 flexDirection={{ base: "column", md: "row" }}
 >
@@ -231,17 +229,6 @@ flexDirection={{ base: "column", md: "row" }}
   />
 </Box>
 <Box flex="2" p={[2,4]} maxW='xl' textColor={'black'} mt={{ base: 0, md: 0 }} ml={{ base: 2, md: 4 }}>
-<Button
-        size={['sm','md']}
-        colorScheme="red"
-        onClick={handleDelete}
-        position="absolute"
-        top="10px" // Adjust the top position as needed
-        right="10px" // Adjust the right position as needed
-        zIndex="1" // Ensure it's above the content
-      >
-        Delete
-      </Button>
   <Heading fontSize={["md","xl"]}>{Product?.name}</Heading>
   <Text color="gray.500" fontSize={["xs","sm"]} mb={2}>
     {Product.Category?.category}
@@ -283,7 +270,7 @@ flexDirection={{ base: "column", md: "row" }}
       +
     </Button>
   </Flex>
-  <Text>Stock left in shop: {stock}</Text>
+  <Text color={"red"}>Stock left in shop: {stock}</Text>
   <Flex mt={4}>
     <Button size={['sm','md']} onClick={handleAddToCart} colorScheme="teal">
       Add to Cart

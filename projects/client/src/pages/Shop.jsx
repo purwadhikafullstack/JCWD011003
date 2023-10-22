@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 const getReverseGeolocation = async (latitude, longitude) => {
   try {
@@ -66,7 +67,9 @@ const Shop = () => {
     const fetchUserAddresses = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8000/api/address", {
+        const decodedToken = jwt_decode(token);
+      const userId = decodedToken.id;
+        const response = await axios.get(`http://localhost:8000/api/address/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -114,7 +117,7 @@ const Shop = () => {
       longitude >= 110.011482 &&
       longitude <= 110.843268) ||
     (userLocation.latitude >= -8.206338 &&
-      userLocation.latitude <= -7.843457 &&
+      userLocation.latitude <= -7.543457 &&
       userLocation.longitude >= 110.011482 &&
       userLocation.longitude <= 110.843268);
 

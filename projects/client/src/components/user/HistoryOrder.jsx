@@ -23,6 +23,8 @@ export default function PersonalData() {
   const [selectedFilter, setSelectedFilter] = useState('');
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  console.log("selected nyoh:", selectedTransaction);
   const handleOpenModal = (transaction) => {
     setSelectedTransaction(transaction);
     setIsModalOpen(true);
@@ -39,7 +41,7 @@ export default function PersonalData() {
         const response = await axios.get('http://localhost:8000/api/user/transaction', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log(response);
+        console.log("cek fetch transaction",response);
         setApiData(response.data);
         setStats(
           response.data.map(item => ({
@@ -207,8 +209,8 @@ console.log('filter',filteredData)
       >
         {isMobileView ? (
           <Grid gap={'2'} templateColumns={"repeat(2, 1fr)"} justifyContent={'space-between'}>
-          <Button size={"xs"}>{item.createdAt}</Button>
           <Button size={"xs"}>{item.id}</Button>
+          <Button size="xs">{new Date(item.createdAt).toLocaleDateString("id-ID")}</Button>
           <Button size={"xs"} textColor={"blue.400"} onClick={() => checkStat(item)}>
   {stats.find(status => status.id === item.id)?.status}
 </Button>
@@ -229,9 +231,9 @@ console.log('filter',filteredData)
 )}
         </Grid>
         ) : (
-          <Flex justifyContent={"space-between"}>
-            <Button size={"xs"}>{item.createdAt}</Button>
+          <Flex justifyContent={"flex-start"} gap={2}>
           <Button size={"xs"}>{item.id}</Button>
+          <Button size="xs">{new Date(item.createdAt).toLocaleDateString("id-ID")}</Button>
           <Button size={"xs"} textColor={"blue.400"} onClick={() => checkStat(item)}>
   {stats.find(status => status.id === item.id)?.status}
 </Button>
@@ -255,7 +257,7 @@ console.log('filter',filteredData)
         <Flex>
           <Box>
             <Image
-              src={``}
+              src={`http://localhost:8000/api/${item.Transaction_Stocks[0].productImg}`}
               boxSize="50px"
               objectFit="cover"
               alt="fruit"
@@ -263,16 +265,18 @@ console.log('filter',filteredData)
           </Box>
           <Box ml={"2"}>
             <Flex>
-              <Text fontSize={"sm"} fontWeight={"bold"}>
-                Apple
+            
+              <Text key={index} fontSize={"sm"} fontWeight={"bold"}>
+                {item.Transaction_Stocks[0].productName}
               </Text>
+            
             </Flex>
             <Flex>
-              <Text fontSize={"sm"}>2</Text>
+              <Text fontSize={"sm"}>{item.Transaction_Stocks[0].qty}</Text>
               <Text fontSize={"sm"}>
                 &nbsp;x&nbsp;
               </Text>
-              <Text fontSize={"sm"}>{formatCurrencyIDR(2000)}</Text>
+              <Text fontSize={"sm"}>{formatCurrencyIDR(item.Transaction_Stocks[0].price/item.Transaction_Stocks[0].qty)}</Text>
               <Text fontSize={"sm"} ml={{ base: "59", sm: "238" }}>
                 Total Order
               </Text>
@@ -283,7 +287,7 @@ console.log('filter',filteredData)
               display={"flex"}
               justifyContent={"end"}
             >
-              {formatCurrencyIDR(40000)}
+              {formatCurrencyIDR(item.totPrice)}
             </Text>
           </Box>
         </Flex>
@@ -299,14 +303,17 @@ console.log('filter',filteredData)
     <ModalCloseButton />
     <ModalBody>
       {selectedTransaction && selectedTransaction.Transaction_Stocks.map((stock, stockIndex) => (
-        <Box key={stockIndex} borderWidth="1px" borderRadius="lg" p="4" marginBottom="4">
-          <Heading as="h2" size="lg" marginBottom="2">
+        <Box display={"flex"} direction="column" borderWidth="1px" borderRadius="lg" p="4" marginBottom="2">
+        <Image src={`http://localhost:8000/api/${stock.productImg}`} boxSize="100px" objectFit="cover" alt="fruit" />
+        <Box key={stockIndex} ml={4} mt={2}>
+          <Heading as="h2" size="md" marginBottom="1">
             {stock.productName}
           </Heading>
           {/* <Text>Product Name: {stock.productName}</Text> */}
           <Text>Quantity: {stock.qty}</Text>
           <Text>Price: {formatCurrencyIDR(stock.price)}</Text>
           {/* Add more details as needed */}
+        </Box>
         </Box>
       ))}
     </ModalBody>

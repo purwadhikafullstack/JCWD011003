@@ -86,7 +86,7 @@ export default function Discount() {
             </Box>
             <Box w={'280px'} h={'150px'} mt={['5','2']}>
                 <Heading fontStyle={'italic'} size={['xs','md']} color={'white'} align={'center'}>
-                    {voucher.Category.category ? voucher.Category.category : "All Product"} Category
+                    {voucher?.Category?.category ? voucher?.Category?.category : "All Product"} Category
                 </Heading>
                 <Heading size={['md','lg']} color={'white'} align={'center'} mt={['2','3']}>
                 {voucher.name} 
