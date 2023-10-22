@@ -1,16 +1,17 @@
+
 import React, { useEffect, useMemo, useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, IconButton, Box } from '@chakra-ui/react';
+import { Table, Thead, Tbody, Tr, Th, Td, IconButton, Box ,} from '@chakra-ui/react';
 import { TriangleDownIcon, TriangleUpIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useTable, useSortBy, usePagination } from 'react-table';
 import axios from 'axios';
 
-function DataTable() {
+function StockHistorySuper() {
   const [data, setData] = useState([]);
   const token = localStorage.getItem('token')
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await axios.get('http://localhost:8000/api/transaction/bhistory', {
+      const result = await axios.get('http://localhost:8000/api/transaction/history', {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -125,4 +126,4 @@ function DataTable() {
   );
 }
 
-export default DataTable;
+export default StockHistorySuper;

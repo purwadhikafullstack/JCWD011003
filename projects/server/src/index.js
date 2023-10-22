@@ -40,7 +40,7 @@ app.use(
 //#region API ROUTES
 // app.use("/public", express.static(path.resolve(__dirname,"../public")))
 app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
-vouchersControllers.scheduleDeleteExpiredVouchers();
+// vouchersControllers.scheduleDeleteExpiredVouchers();
 
 // ===========================
 // NOTE : Add your routes here

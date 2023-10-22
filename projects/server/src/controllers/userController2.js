@@ -117,6 +117,7 @@ async function createTransaction (req, res) {
         weight: cartStock.weight,
         id_product: stock.id_product,
         productName: product.name, // Include the product name
+        productImg: product.productImg, // Include the product name
         // Copy any other columns from Cart_Stock that need to be included in Transaction_Stock
       };
 
@@ -136,8 +137,8 @@ async function createTransaction (req, res) {
 
       const stockHistoryData = {
         id_stock: cartStock.id_stock,
-        changeQty: -cartStock.qty, // Negative quantity to indicate a decrease
-        totalQty: stock.qty - cartStock.qty, // Updated total quantity
+        changeQty: -cartStock.qty, 
+        totalQty: stock.qty - cartStock.qty, 
         changedBy: 'Transaction',
         id_change: newTransaction.id
          // You can specify who made the change here
@@ -171,4 +172,23 @@ async function createTransaction (req, res) {
   }
 }
 
-module.exports = {getAddressCheckout, createTransaction, deleteCartItems}
+async function confirmArrival (req, res) {
+  try {
+    const {trId} = req.params;
+    await db.sequelize.transaction(async(t) => {
+      const confirm = await Transaction.update({
+        id_status: 5
+      },
+    {where: {
+      id: trId
+    }}
+      )
+      return res.status(200).json({confirm, message: 'Package confirmed'})
+    })
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error });
+  }
+  }
+
+module.exports = {getAddressCheckout, createTransaction, confirmArrival }

@@ -62,8 +62,9 @@ export default function Product() {
         apiUrl += `&orderByName=${name}`;
       }
       const response = await axios.get(apiUrl);
-      const yogyakartaStock = response.data.data
-    setProduct(yogyakartaStock);
+      console.log('response', response)
+      const jakartaStock = response.data.data
+    setProduct(jakartaStock);
     setTotalPages(response.data.totalPages);
     } catch (err) {
     }

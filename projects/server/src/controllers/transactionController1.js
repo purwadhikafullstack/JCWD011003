@@ -7,7 +7,6 @@ const Transaction_Status = db.Transaction_Status;
 const Stock_History = db.Stock_History;
 const Stock = db.Stock;
 const Branch = db.Branch;
-const Op = db.Sequelize.Op;
 
 async function getTransactionUser (req, res) {
     try {
@@ -53,6 +52,12 @@ async function getAllTransactionByBranch(req, res) {
       where: { id_branch: branch },
       limit: limit,
       offset: offset,
+      include: [
+        { model: Transaction_Status, attributes: ['status'] },
+        { model: User, attributes: ['id', 'name'] },
+        { model: Branch, attributes: ['id', 'name'] },
+        { model: Transaction_Stock }
+      ]
     };
 
     if (req.query.id_user) {
@@ -68,10 +73,10 @@ async function getAllTransactionByBranch(req, res) {
       };
     }
 
-    const transactions = await Transaction.findAll({
-      where: {
-        id_branch: branch,
-      },
+    const transactions = await Transaction.findAll(query,{
+      // where: {
+      //   id_branch: branch,
+      // },
       include: [
         {
           model: Transaction_Status,
@@ -114,6 +119,12 @@ async function getAllTransaction (req, res) {
       where: {},
       limit: limit,
       offset: offset,
+      include: [
+        { model: Transaction_Status, attributes: ['status'] },
+        { model: User, attributes: ['id', 'name'] },
+        { model: Branch, attributes: ['id', 'name'] },
+        { model: Transaction_Stock }
+      ]
     };
 
     if (req.query.id_branch) {
@@ -130,13 +141,8 @@ async function getAllTransaction (req, res) {
       };
     }
 
-    const transactions = await Transaction.findAll({
-      where: {
-        id: { [Op.ne]: null },
-      },
-      include: [{model: Transaction_Status, attributes:['status']}, {model: User, attributes:['id', 'name']}, {model: Branch, attributes:['id', 'name']}, {model: Transaction_Stock}]
-    });
-    
+    const transactions = await Transaction.findAll(query);
+
     res.status(200).json({transaction:transactions});
   } catch (error) {
     console.error('Error:', error);
@@ -144,16 +150,30 @@ async function getAllTransaction (req, res) {
   }
 }
 
+async function getAllStockHistory(req, res) {
+  try {
+    const stocks = await Stock_History.findAll({
+      include: {
+        model: Stock,
+      },
+    });
 
+    res.status(200).json(stocks); // Send the result as a JSON response
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
 async function getStockHistoryByBranch(req, res) {
   try {
-    const { id_branch } = req.account; // Replace with the actual id_branch you want to query for
+    console.log('req',req.account)
+    const { branch} = req.account; // Replace with the actual id_branch you want to query for
 
     const stocks = await Stock_History.findAll({
       include: {
         model: Stock,
         where: {
-          id_branch: id_branch,
+          id_branch: branch,
         },
       },
     });
@@ -192,7 +212,13 @@ async function getStockHistoryIdByBranch(req, res) {
         include: [
           {
               model: Transaction_Stock,
-              include: [{ model: Product }]
+          },
+          {
+            model:Transaction_Payment ,
+          },
+          {
+            model: Transaction_Status,
+            attributes: ['status']
           }
       ]
       })
@@ -206,6 +232,7 @@ async function getStockHistoryIdByBranch(req, res) {
   async function cancelTransaction (req,res) {
     try {
       const {id} = req.params;
+      console.log('id',id)
       const transaction = await Transaction.update({id_status: 6}, {
         where : {
           id: id
@@ -217,9 +244,57 @@ async function getStockHistoryIdByBranch(req, res) {
       res.status(500).json({ error: 'An error occurred' });
     }
   }
+
+  async function getTROnly (req,res) {
+    try {
+      const page = req.query.page || 1; // Default to page 1 if not provided
+      let limit = req.query.limit || 10; // Default to 10 records per page if not provided
+      limit = limit > 10 ? 10 : limit; // If limit exceeds 10, set it back to 10
+      const offset = (page - 1) * limit;
+  
+      const query = {
+        order: [
+          ['createdAt', 'DESC'],
+          ['id_branch', 'ASC'],
+          ['id_status', 'ASC'],
+        ],
+        where: {},
+        limit: limit,
+        offset: offset,
+        // include: [
+        //   { model: Transaction_Status, attributes: ['status'] },
+        //   { model: User, attributes: ['id', 'name'] },
+        //   { model: Branch, attributes: ['id', 'name'] },
+        //   { model: Transaction_Stock }
+        // ]
+      };
+  
+      if (req.query.id_branch) {
+        query.where.id_branch = req.query.id_branch;
+      }
+  
+      if (req.query.id_user) {
+        query.where.id_user = req.query.id_user;
+      }
+  
+      if (req.query.startDate && req.query.endDate) {
+        query.where.createdAt = {
+          [Op.between]: [new Date(req.query.startDate), new Date(req.query.endDate).setHours(23, 59, 59)],
+        };
+      }
+  
+      const transactions = await Transaction.findAll(query);
+  
+      res.status(200).json({transaction:transactions});
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
   module.exports = {getTransactionById, 
     getStockHistoryByBranch, 
     getTransactionDetail, cancelTransaction,
     getTransactionUser, getAllTransaction,
-    getStockHistoryIdByBranch, getAllTransactionByBranch
+    getStockHistoryIdByBranch, getAllTransactionByBranch,
+    getAllStockHistory, getTROnly
   }
