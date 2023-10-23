@@ -56,7 +56,7 @@ const StockProductJKT = () => {
     const customQty = window.prompt("Enter the quantity to add:", "1");
     if (customQty !== null) {
       try {
-        const response = await fetch("http://localhost:8000/api/stock/add", {
+        const response = await fetch("https://jcwd011003.purwadhikabootcamp.com/api/stock/add", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -112,7 +112,7 @@ const StockProductJKT = () => {
     const customQty = window.prompt("Enter the quantity to reduce:", "1");
     if (customQty !== null) {
       try {
-        const response = await fetch("http://localhost:8000/api/stock/reduce", {
+        const response = await fetch("https://jcwd011003.purwadhikabootcamp.com/api/stock/reduce", {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const StockProductJKT = () => {
 
   const handleFormSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/stock", {
+      const response = await fetch("https://jcwd011003.purwadhikabootcamp.com/api/stock", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -249,9 +249,21 @@ const StockProductJKT = () => {
     setCurrentPage(page);
   };
 
+  const handlePrevClick = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextClick = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  }
+
   useEffect(() => {
     fetch(
-      `http://localhost:8000/api/stock?pageSize=16&id_product=${filterProductName}&id_category=${filterCategoryName}&orderByName=${orderByName}&orderByPrice=${orderByPrice}&page=${currentPage}`
+      `https://jcwd011003.purwadhikabootcamp.com/api/stock?pageSize=16&id_product=${filterProductName}&id_category=${filterCategoryName}&orderByName=${orderByName}&orderByPrice=${orderByPrice}&page=${currentPage}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -278,7 +290,7 @@ const StockProductJKT = () => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/stock-promo")
+    fetch("https://jcwd011003.purwadhikabootcamp.com/api/stock-promo")
       .then((response) => response.json())
       .then((data) => {
         setPromoOptions(data.data);
@@ -429,6 +441,9 @@ const StockProductJKT = () => {
         )}
       </Box>
       <Box mt={2} display="flex" justifyContent="center">
+      <Button m={1} colorScheme="teal" onClick={handlePrevClick} disabled={currentPage === 1}>
+          Previous
+        </Button>
         {pages.map((page) => (
           <Button
             m={1}
@@ -440,6 +455,9 @@ const StockProductJKT = () => {
             {page}
           </Button>
         ))}
+        <Button m={1} colorScheme="teal" onClick={handleNextClick} disabled={currentPage === totalPages}>
+          Next
+        </Button>
       </Box>
       {selectedStock && (
         <EditStockModal

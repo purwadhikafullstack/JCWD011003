@@ -47,6 +47,7 @@ async function login (req, res) {
 async function confirmPayment (req, res) {
     try {
         const {id} = req.params;
+        console.log('id',id)
         const transaction = await Transaction.update({id_status: 3}, {
             where: {
                 id: id

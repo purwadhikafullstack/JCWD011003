@@ -23,7 +23,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       defaultValue: '0', 
     },
-    isVerified: DataTypes.BOOLEAN,
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, 
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true, 

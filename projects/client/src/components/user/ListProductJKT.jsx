@@ -48,7 +48,7 @@ export default function Product() {
 
   const fetchProduct = async () => {
     try {
-      let apiUrl = `http://localhost:8000/api/stock/?page=${currentPage}&id_branch=2`;
+      let apiUrl = `https://jcwd011003.purwadhikabootcamp.com/api/stock/?page=${currentPage}&id_branch=2`;
       if (searchQuery) {
         apiUrl += `&name=${searchQuery}`;
       }
@@ -62,8 +62,9 @@ export default function Product() {
         apiUrl += `&orderByName=${name}`;
       }
       const response = await axios.get(apiUrl);
-      const yogyakartaStock = response.data.data
-    setProduct(yogyakartaStock);
+      console.log('response', response)
+      const jakartaStock = response.data.data
+    setProduct(jakartaStock);
     setTotalPages(response.data.totalPages);
     } catch (err) {
     }
@@ -169,7 +170,7 @@ export default function Product() {
                   height={[90,130]}
                   width={190}
                   objectFit="contain"
-                  src={`http://localhost:8000/api/${product.Product.productImg}`}
+                  src={`https://jcwd011003.purwadhikabootcamp.com/api/${product.Product.productImg}`}
                   alt="#"
                 />
               </Box>

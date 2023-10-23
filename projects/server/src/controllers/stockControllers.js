@@ -5,6 +5,7 @@ const Cart_Stock = db.Cart_Stock;
 const Cart = db.Cart;
 const Branch = db.Branch;
 const Stock_Promos = db.Stock_Promos;
+const Stock_History = db.Stock_History;
 const Category = db.Category;
 const { Op } = require("sequelize");
 
@@ -163,110 +164,147 @@ const stockControllers = {
 
   addStockProduct: async (req, res) => {
     try {
-      const { id_product, id_branch, qty } = req.body;
+        const { id_product, id_branch, qty } = req.body;
 
-      let stock = await Stock.findOne({
-        where: {
-          id_product,
-          id_branch,
-        },
-      });
-
-      if (!stock) {
-        stock = await Stock.create({
-          id_product,
-          id_branch,
-          qty: 0,
+        // Find the existing stock record or create a new one if it doesn't exist
+        let stock = await Stock.findOne({
+            where: {
+                id_product,
+                id_branch,
+            },
         });
-      }
 
-      stock.qty += qty;
+        if (!stock) {
+            stock = await Stock.create({
+                id_product,
+                id_branch,
+                qty: 0,
+            });
+        }
 
-      await stock.save();
-      const updatedStock = await Stock.findOne({
-        where: {
-          id_product,
-          id_branch,
-        },
-        include: [
-          {
-            model: Product,
-            attributes: ["id", "name", "price"],
-          },
-          {
-            model: Branch,
-            attributes: ["id", "name"],
-          },
-          {
-            model: Stock_Promos,
-            attributes: ["id", "promoName"],
-          },
-        ],
-      });
+        // Record the current stock quantity before the update
+        const oldQty = stock.qty;
 
-      return res.status(200).json({
-        message: "Stock add successfully",
-        stock: updatedStock,
-      });
+        // Update the stock quantity
+        stock.qty += qty;
+
+        // Save the updated stock record
+        await stock.save();
+
+        // Create a Stock_History record to log the change
+        await Stock_History.create({
+            id_stock: stock.id,  // Assuming 'id' is the primary key of the Stock model
+            changeQty: qty,
+            totalQty: stock.qty,
+            changedBy: 'Stock Addition', // Assuming you have user information in the request
+            actor: `Admin id${req.account.id}`, // Assuming you have user information in the request
+            // You can add more information to the history record as needed
+        });
+
+        // Fetch the updated stock with related data
+        const updatedStock = await Stock.findOne({
+            where: {
+                id_product,
+                id_branch,
+            },
+            include: [
+                {
+                    model: Product,
+                    attributes: ["id", "name", "price"],
+                },
+                {
+                    model: Branch,
+                    attributes: ["id", "name"],
+                },
+                {
+                    model: Stock_Promos,
+                    attributes: ["id", "promoName"],
+                },
+            ],
+        });
+
+        return res.status(200).json({
+            message: "Stock added successfully",
+            stock: updatedStock,
+        });
     } catch (error) {
-      console.error("Error updating stock:", error);
-      return res.status(500).json({ error: "Internal server error" });
+        console.error("Error updating stock:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
-  },
+},
+
 
   reduceStockProduct: async (req, res) => {
     try {
-      const { id_product, id_branch, qty } = req.body;
+        const { id_product, id_branch, qty } = req.body;
 
-      let stock = await Stock.findOne({
-        where: {
-          id_product,
-          id_branch,
-        },
-      });
+        // Find the existing stock record
+        let stock = await Stock.findOne({
+            where: {
+                id_product,
+                id_branch,
+            },
+        });
 
-      if (!stock) {
-        return res.status(404).json({ error: "Stock not found" });
-      }
+        if (!stock) {
+            return res.status(404).json({ error: "Stock not found" });
+        }
 
-      if (stock.qty < qty) {
-        return res.status(400).json({ error: "Insufficient stock quantity" });
-      }
+        if (stock.qty < qty) {
+            return res.status(400).json({ error: "Insufficient stock quantity" });
+        }
 
-      stock.qty -= qty;
-      await stock.save();
+        // Record the current stock quantity before the update
+        const oldQty = stock.qty;
 
-      await stock.save();
-      const updatedStock = await Stock.findOne({
-        where: {
-          id_product,
-          id_branch,
-        },
-        include: [
-          {
-            model: Product,
-            attributes: ["id", "name", "price"],
-          },
-          {
-            model: Branch,
-            attributes: ["id", "name"],
-          },
-          {
-            model: Stock_Promos,
-            attributes: ["id", "promoName"],
-          },
-        ],
-      });
+        // Update the stock quantity
+        stock.qty -= qty;
 
-      return res.status(200).json({
-        message: "Stock add successfully",
-        stock: updatedStock,
-      });
+        // Save the updated stock record
+        await stock.save();
+
+        // Create a Stock_History record to log the change
+        Stock_History.create({
+          id_stock: stock.id,  // Assuming 'id' is the primary key of the Stock model
+          changeQty: -qty,
+          totalQty: stock.qty,
+          changedBy: 'Stock reduction', // Assuming you have user information in the request
+          actor: `Admin id${req.account.id}`, // Assuming you have user information in the request
+            // You can add more information to the history record as needed
+        });
+
+        // Fetch the updated stock with related data
+        const updatedStock = await Stock.findOne({
+            where: {
+                id_product,
+                id_branch,
+            },
+            include: [
+                {
+                    model: Product,
+                    attributes: ["id", "name", "price"],
+                },
+                {
+                    model: Branch,
+                    attributes: ["id", "name"],
+                },
+                {
+                    model: Stock_Promos,
+                    attributes: ["id", "promoName"],
+                },
+            ],
+        });
+
+        return res.status(200).json({
+            message: "Stock reduced successfully",
+            stock: updatedStock,
+        });
     } catch (error) {
-      console.error("Error updating stock:", error);
-      return res.status(500).json({ error: "Internal server error" });
+        console.error("Error updating stock:", error);
+        return res.status(500).json({ error: "Internal server error" });
     }
-  },
+},
+
 
   getAllStock: async (req, res) => {
     try {

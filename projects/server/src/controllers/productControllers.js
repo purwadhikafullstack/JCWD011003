@@ -141,6 +141,8 @@ const productControllers = {
       const productId = req.params.id;
       const { name, price, description, weight, isActive, id_category } =
         req.body;
+        const idcategory = parseInt(req.body.id_category);
+        console.log('id cat', id_category,  idcategory)
 
       const updatedFields = {
         name,
@@ -148,7 +150,7 @@ const productControllers = {
         description,
         weight,
         isActive,
-        id_category,
+        id_category: idcategory,
       };
 
       if (req.file) {

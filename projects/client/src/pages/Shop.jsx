@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import axios from "axios";
-import jwt_decode from 'jwt-decode';
+import jwt_decode from "jwt-decode";
 
 const getReverseGeolocation = async (latitude, longitude) => {
   try {
@@ -69,12 +69,11 @@ const Shop = () => {
         const token = localStorage.getItem("token");
         const decodedToken = jwt_decode(token);
       const userId = decodedToken.id;
-        const response = await axios.get(`http://localhost:8000/api/address/${userId}`, {
+        const response = await axios.get(`https://jcwd011003.purwadhikabootcamp.com/api/address/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("Response address:", response);
         setAvailableAddresses(response.data.data);
       } catch (error) {
         console.error("Error fetching user addresses:", error);
@@ -144,23 +143,22 @@ const Shop = () => {
 
   return (
     <>
-
+    
       <Box bg={"#c4fff2"} pt={4} display={"flex"} justifyContent={"center"}>
-        <Text ml={["4",""]} fontSize={["sm","lg"]} fontWeight="semibold">
+        <Text fontSize={"lg"} fontWeight="semibold">
           Your Current Position
         </Text>
-        <Text ontSize={["sm","lg"]} fontWeight="bold">
+        <Text fontSize={"lg"} fontWeight="bold">
           : {userAddress}
         </Text>
       </Box>
 
-      <Flex bg={"#c4fff2"} pt={4} w={"100%"} px={["4%","20%"]}>
-        <Text minW={"130px"} fontSize={["sm","lg"]} pt={1} fontWeight={"semibold"}>
+      <Flex bg={"#c4fff2"} pt={4} w={"100%"} px={"20%"}>
+        <Text minW={"130px"} fontSize="lg" pt={1} fontWeight={"semibold"}>
           Select Address:
         </Text>
         <Select
           placeholder="Select an address"
-          size={["xs","md"]}
           border={"1px solid"}
           onChange={(event) => {
             const selected = availableAddresses.find(
@@ -177,7 +175,6 @@ const Shop = () => {
         </Select>
         <Button
           ml={5}
-          size={['sm','md']}
           colorScheme="teal"
           variant="solid"
           onClick={() => handleAddressSelect()}
@@ -189,10 +186,10 @@ const Shop = () => {
       {selectedAddress && (
         <Box bg={"#c4fff2"} pt={2} display="flex" justifyContent="center">
           
-          <Text fontSize={["sm","lg"]} fontWeight="bold" ml={[4,2]}>
+          <Text fontSize="lg" fontWeight="bold" ml={2}>
             {selectedAddress.userName}:
           </Text>
-          <Text fontSize={["sm","lg"]}  ml={2}>
+          <Text fontSize="lg"  ml={2}>
             (Latitude: {selectedAddress.latitude} Longitude:{" "}
             {selectedAddress.longitude})
           </Text>

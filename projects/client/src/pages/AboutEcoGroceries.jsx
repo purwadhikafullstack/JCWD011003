@@ -24,7 +24,7 @@ const founders = [
   },
   {
     name: "Fahrur Nak Sidoarjo.",
-    photo: "https://media.licdn.com/dms/image/D5603AQGdX-mjrDDmgg/profile-displayphoto-shrink_800_800/0/1679772317255?e=2147483647&v=beta&t=dJ3pJLvCkw6aSan8nva5YC7nG6v2m355gs3Im5YWbhE", // Replace with the actual image filename
+    photo: "https://media.cakeresume.com/image/upload/s--UUr0VqaZ--/c_fill,g_face,h_300,w_300/v1665416386/yo2dgm2xbj9zqwtgop8s.jpg", // Replace with the actual image filename
   },
 ];
 
