@@ -151,7 +151,7 @@ const toast = useToast()
   cursor="pointer" 
   onClick={() => {
     if (transaction.Transaction_Payment && transaction.Transaction_Payment.paymentProof) {
-      setModalImageUrl(`https://jcwd011003.purwadhikabootcamp.com/api/public/${transaction.Transaction_Payment.paymentProof}`);
+      setModalImageUrl(`https://jcwd011003.purwadhikabootcamp.com/api/${transaction.Transaction_Payment.paymentProof}`);
       setIsModalOpen(true);
     }
   }}
