@@ -39,7 +39,13 @@ app.use(
 // const {authRouter, userRouter} = require('./router')
 //#region API ROUTES
 // app.use("/public", express.static(path.resolve(__dirname,"../public")))
-app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
+// app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
+
+if(__dirname.split("/").includes("www")) {
+  app.use("/api/public", express.static(path.resolve(__dirname, "../../../public")))
+} else{
+  app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
+}
 // vouchersControllers.scheduleDeleteExpiredVouchers();
 
 // ===========================
