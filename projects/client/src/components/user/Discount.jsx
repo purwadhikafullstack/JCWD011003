@@ -103,7 +103,6 @@ export default function Discount() {
                 </Text>
                 <Flex mt={['2', '2']} justify={'space-around'} mr={['2','5']}>
                     <Text
-                    fontWeight={'bold'}
                         fontSize={['xs','md']}
                         color={'white'}
                         align={'center'}
@@ -111,7 +110,6 @@ export default function Discount() {
                         Max Disc {formatCurrencyIDR(voucher.maxDiscPrice)}
                     </Text>
                     <Text
-                    fontWeight={'bold'}
                         fontSize={['xs','md']}
                         color={'white'}
                         align={'center'}
