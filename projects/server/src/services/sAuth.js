@@ -13,7 +13,7 @@ const users = db.User;
 const carts = db.Cart;
 const JWT_KEY = process.env.JWT_KEY;
 const VERIFY_MESSAGE = "Please check your email to verify your account";
-const BASE_REDIRECT = "http://localhost:3000";
+const BASE_REDIRECT = "https://jcwd011003.purwadhikabootcamp.com";
 
 async function hashPass(password) {
     const salt = await bcrypt.genSalt(10);
