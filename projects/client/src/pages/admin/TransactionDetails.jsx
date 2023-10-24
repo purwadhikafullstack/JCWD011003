@@ -20,8 +20,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useLoaderData } from "react-router-dom";
 
-const token = localStorage.getItem("token");
 const TransactionDetails = () => {
+  const token = localStorage.getItem("token");
   const [transaction, setTransaction] = useState(null);
   const [status, setStatus] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,17 +34,26 @@ const TransactionDetails = () => {
   console.log("tr", tr);
 
   useEffect(() => {
-    setTransaction(tr);
-    if (tr && tr.Transaction_Status) {
-      setStatus(tr.Transaction_Status.status);
-    }
-    console.log("teh real", transaction);
+    const fetchData = async () => {
+      try {
+        setTransaction(tr);
+        if (tr && tr.Transaction_Status) {
+          setStatus(tr.Transaction_Status.status);
+        }
+      } catch (error) {
+        // Handle error if any
+      }
+    };
+    fetchData();
   }, [tr]);
+  if (!transaction) {
+    return <div>Loading...</div>;
+  }
 
   const acceptOrder = async () => {
     try {
       const result = await axios.patch(
-        `https://jcwd011003.purwadhikabootcamp.com/api/admin/confirm/${id}`,
+        `http://localhost:8000/api/admin/confirm/${id}`,
         null,
         {
           headers: {
@@ -74,13 +83,10 @@ const TransactionDetails = () => {
     }
   };
 
-  if (!transaction) {
-    return <div>Loading...</div>;
-  }
   const cancelOrder = async () => {
     try {
       const result = await axios.patch(
-        `https://jcwd011003.purwadhikabootcamp.com/api/admin/cancel/${id}`,
+        `http://localhost:8000/api/admin/cancel/${id}`,
         null,
         {
           headers: {
@@ -94,8 +100,8 @@ const TransactionDetails = () => {
         duration: 3000,
         isClosable: true,
       });
-      setTransaction({ ...transaction, id_status: 6 });
-      setStatus("Cancelled");
+      await setTransaction({ ...transaction, id_status: 6 });
+      await setStatus("Cancelled");
     } catch (error) {
       console.error(error);
       toast({
@@ -111,7 +117,7 @@ const TransactionDetails = () => {
   const sendOrder = async () => {
     try {
       const result = await axios.patch(
-        `https://jcwd011003.purwadhikabootcamp.com/api/admin/send/${id}`,
+        `http://localhost:8000/api/admin/send/${id}`,
         null,
         {
           headers: {
@@ -166,6 +172,11 @@ const TransactionDetails = () => {
     setIsModalOpen(false);
     setModalImageUrl("");
   };
+
+  // useEffect(() => {
+
+  // },[transaction])
+
   return (
     <Box
       border="1px"
@@ -181,7 +192,7 @@ const TransactionDetails = () => {
           src={
             transaction.Transaction_Payment &&
             transaction.Transaction_Payment.paymentProof
-              ? `https://jcwd011003.purwadhikabootcamp.com/api/${transaction.Transaction_Payment.paymentProof}`
+              ? `http://localhost:8000/api/${transaction.Transaction_Payment.paymentProof}`
               : "Unpaid transaction"
           }
           alt="Unpaid Transaction"
@@ -193,7 +204,7 @@ const TransactionDetails = () => {
               transaction.Transaction_Payment.paymentProof
             ) {
               setModalImageUrl(
-                `https://jcwd011003.purwadhikabootcamp.com/api/public/${transaction.Transaction_Payment.paymentProof}`
+                `http://localhost:8000/api/public/${transaction.Transaction_Payment.paymentProof}`
               );
               setIsModalOpen(true);
             }
@@ -305,16 +316,14 @@ const TransactionDetails = () => {
 export default TransactionDetails;
 
 export const currentTransactionLoader = async ({ params }) => {
+  const token = localStorage.getItem("token");
   const { id } = params;
 
-  const res = await fetch(
-    `https://jcwd011003.purwadhikabootcamp.com/api/transaction/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const res = await fetch(`http://localhost:8000/api/transaction/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   return res.json();
 };

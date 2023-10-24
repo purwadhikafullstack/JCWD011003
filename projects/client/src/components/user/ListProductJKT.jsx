@@ -39,10 +39,10 @@ export default function Product() {
 
   const handleCategoryFilter = (id_category) => {
     setCategory(id_category);
-    if (category===id_category) {
-        setCategory(null)
+    if (category === id_category) {
+      setCategory(null);
     } else {
-        setCategory(id_category)
+      setCategory(id_category);
     }
   };
 
@@ -62,12 +62,11 @@ export default function Product() {
         apiUrl += `&orderByName=${name}`;
       }
       const response = await axios.get(apiUrl);
-      console.log('response', response)
-      const jakartaStock = response.data.data
-    setProduct(jakartaStock);
-    setTotalPages(response.data.totalPages);
-    } catch (err) {
-    }
+      console.log("response", response);
+      const jakartaStock = response.data.data;
+      setProduct(jakartaStock);
+      setTotalPages(response.data.totalPages);
+    } catch (err) {}
   };
 
   useEffect(() => {
@@ -90,7 +89,7 @@ export default function Product() {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0, 
+      maximumFractionDigits: 0,
     }).format(numericPrice);
   };
 
@@ -101,9 +100,9 @@ export default function Product() {
   };
 
   return (
-    <Box minW={["","1190"]} maxW={["","1190"]}>
-      <Box width={["91%","97.2%"]} ml={'4'}>
-        <InputGroup borderRadius={"full"} size={["xs","sm"]}>
+    <Box minW={["", "1190"]} maxW={["", "1190"]}>
+      <Box width={["91%", "97.2%"]} ml={"4"}>
+        <InputGroup borderRadius={"full"} size={["xs", "sm"]}>
           <InputLeftElement
             pointerEvents="none"
             children={<Search2Icon color="white.600" />}
@@ -118,7 +117,7 @@ export default function Product() {
           />
           <InputRightAddon p={0} borderRightRadius={"full"}>
             <Button
-              size={["xs","sm"]}
+              size={["xs", "sm"]}
               rounded={"full"}
               variant={"outline"}
               onClick={fetchProduct}
@@ -139,7 +138,14 @@ export default function Product() {
         setName={setName}
         handleSearch={handleSearch}
       />
-      <Flex w="100%" columnGap={[9,6]} rowGap={[4,6]} wrap="wrap" pl={4} mb={4}>
+      <Flex
+        w="100%"
+        columnGap={[9, 6]}
+        rowGap={[4, 6]}
+        wrap="wrap"
+        pl={4}
+        mb={4}
+      >
         {product.map((product, index) => (
           <Box
             key={index}
@@ -147,8 +153,8 @@ export default function Product() {
             role="group"
             maxW={{ base: "43%", md: "212px" }}
             w="full"
-            pointerEvents={product.qty===0 ? "none":true}
-            bg={product.qty===0 ? "blackAlpha.300":bgColor}
+            pointerEvents={product.qty === 0 ? "none" : true}
+            bg={product.qty === 0 ? "blackAlpha.300" : bgColor}
             boxShadow="md"
             rounded="lg"
             pos="relative"
@@ -160,14 +166,14 @@ export default function Product() {
                 rounded="lg"
                 mt={-8}
                 pos="relative"
-                height={["80px","120px"]}
+                height={["80px", "120px"]}
                 style={{
                   filter: product.qty === 0 ? "blur(7px)" : "none",
                 }}
               >
                 <Image
                   borderRadius="xl"
-                  height={[90,130]}
+                  height={[90, 130]}
                   width={190}
                   objectFit="contain"
                   src={`https://jcwd011003.purwadhikabootcamp.com/api/${product.Product.productImg}`}
@@ -183,12 +189,21 @@ export default function Product() {
                 >
                   {product.Product.Category?.category}
                 </Text>
-                <Heading color="black" fontFamily="cursive" fontSize={["sm","md"]} m={0}>
+                <Heading
+                  color="black"
+                  fontFamily="cursive"
+                  fontSize={["sm", "md"]}
+                  m={0}
+                >
                   {product.Product.name}
                 </Heading>
                 <Stack align={"center"} justify={"center"}>
                   <Flex>
-                    <Text fontWeight={800} fontSize={["sm","md"]} color={"teal"}>
+                    <Text
+                      fontWeight={800}
+                      fontSize={["sm", "md"]}
+                      color={"teal"}
+                    >
                       {" "}
                       {formatPriceAsIDR(
                         product.Product.price -
@@ -196,27 +211,33 @@ export default function Product() {
                             100
                       )}
                     </Text>
-                    <Text color={"red"} fontSize={["2xs","xs"]}>
-                      {product.discountPercent}%
-                    </Text>{" "}
+                    {product.discountPercent > 0 && ( // Tambahkan kondisi ini
+                      <Text color={"red"} fontSize={["2xs", "xs"]}>
+                        {product.discountPercent}%
+                      </Text>
+                    )}
                   </Flex>
-                  <Text
-                    textDecoration={"line-through"}
-                    color={"gray.600"}
-                    fontSize={["2xs","xs"]}
-                  >
-                    {formatPriceAsIDR(product.Product.price)}
-                  </Text>
+                  {product.discountPercent > 0 && ( // Tambahkan kondisi ini
+                    <Text
+                      textDecoration={"line-through"}
+                      color={"gray.600"}
+                      fontSize={["2xs", "xs"]}
+                    >
+                      {formatPriceAsIDR(product.Product.price)}
+                    </Text>
+                  )}
                 </Stack>
               </Stack>
             </Link>
             <Link to={`/shop/${product.id}`}>
               <Button
-                size={'md'}
-                fontSize={'small'}
-                variant={'ghost'}
-                _hover={{ backgroundColor: 'teal.200' }} 
-              > {product.qty===0 ? "Sold Out":"Shop Now"}
+                size={"md"}
+                fontSize={"small"}
+                variant={"ghost"}
+                _hover={{ backgroundColor: "teal.200" }}
+              >
+                {" "}
+                {product.qty === 0 ? "Sold Out" : "Shop Now"}
                 <MdShoppingCartCheckout color="black" size={15} />
               </Button>
             </Link>
