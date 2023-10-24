@@ -13,17 +13,17 @@ const users = db.User;
 const carts = db.Cart;
 const JWT_KEY = process.env.JWT_KEY;
 const VERIFY_MESSAGE = "Please check your email to verify your account";
-const BASE_REDIRECT = "http://localhost:3000";
+const BASE_REDIRECT = "https://jcwd011003.purwadhikabootcamp.com";
 
 async function hashPass(password) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
 }
 
-async function isExist(name, email, phone, referred_by ) {
+async function isExist(name, email, phone ) {
     const checkAccount = await users.findAll({
         where: {
-            [Op.or]: [{ name }, { email }, { phone }, { referred_by }],
+            [Op.or]: [{ name }, { email }, { phone }],
         },
     });
     if (checkAccount.length === 0) return false;

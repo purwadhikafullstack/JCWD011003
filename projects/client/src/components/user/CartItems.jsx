@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import {  Text, Image, Button, VStack, Grid, HStack } from "@chakra-ui/react";
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Text, Image, Button, VStack, Grid, HStack } from "@chakra-ui/react";
+import axios from "axios";
 import { useToast } from "@chakra-ui/react";
 
 const CartItems = ({ data, onRemove }) => {
   const [quantity, setQuantity] = useState(data.qty);
   const [tempQuantity, setTempQuantity] = useState(data.qty);
   const toast = useToast(); // Initialize Chakra UI toast
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const handleIncrement = () => {
-    if (tempQuantity < data.Stock.qty) { // Check if stock quantity allows increment
+    if (tempQuantity < data.Stock.qty) {
+      // Check if stock quantity allows increment
       setTempQuantity(tempQuantity + 1);
     } else {
       // Show a toast message for exceeding stock
@@ -36,26 +37,49 @@ const CartItems = ({ data, onRemove }) => {
       quantity: tempQuantity,
     };
     try {
-      const response = await axios.post('https://jcwd011003.purwadhikabootcamp.com/api/user/cart', requestData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      const response = await axios.post(
+        "https://jcwd011003.purwadhikabootcamp.com/api/user/cart",
+        requestData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast({
+        title: "Cart updated successfully",
+        status: "success",
+        duration: 3000, // Display for 3 seconds
+        isClosable: true,
       });
-      console.log('Cart updated successfully', response.data);
+
+      console.log("Cart updated successfully", response.data);
       setQuantity(tempQuantity);
     } catch (error) {
-      console.error('Error updating cart:', error);
+      console.error("Error updating cart:", error);
+
+      toast({
+        title: "Error updating cart",
+        description: error.message,
+        status: "error",
+        duration: 3000, // Display for 3 seconds
+        isClosable: true,
+      });
     }
   };
 
   const handleRemove = async () => {
     const itemId = data.id;
     try {
-      const res = await axios.delete(`https://jcwd011003.purwadhikabootcamp.com/api/user/clean/${itemId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const res = await axios.delete(
+        `https://jcwd011003.purwadhikabootcamp.com/api/user/clean/${itemId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       toast({
         title: "Item Deleted",
         description: `Item ${itemId} has been successfully deleted.`,
@@ -64,7 +88,7 @@ const CartItems = ({ data, onRemove }) => {
         isClosable: true,
       });
       onRemove(itemId);
-      console.log('del', res)
+      console.log("del", res);
     } catch (error) {
       toast({
         title: "Error Deleting Item",
@@ -73,52 +97,61 @@ const CartItems = ({ data, onRemove }) => {
         duration: 3000,
         isClosable: true,
       });
-      console.error('Error removing item:', error);
+      console.error("Error removing item:", error);
     }
   };
 
   useEffect(() => {
-    console.log('tempQuantity:', tempQuantity);
+    console.log("tempQuantity:", tempQuantity);
   }, [tempQuantity]);
 
   return (
     <>
-    <VStack 
-      spacing={4}
-      p={3}
-      borderWidth="1px"
-      borderRadius="lg"
-      overflow="hidden"
-      flexWrap="wrap"
-      alignItems="flex-start"
-    >
-      <Grid 
-        templateColumns="1fr 3fr"
-        gap={4}
+      <VStack
+        spacing={4}
+        p={3}
+        borderWidth="1px"
+        borderRadius="lg"
+        overflow="hidden"
+        flexWrap="wrap"
+        alignItems="flex-start"
       >
-        <Image src={`https://jcwd011003.purwadhikabootcamp.com/api/${data.Stock.Product.productImg}`} boxSize="100px" objectFit="cover" />
-        <Text
-          mt="1"
-          fontWeight="semibold"
-          as="h4"
-          lineHeight="tight"
-          isTruncated
-        >
-          {data.Stock.Product.name}
+        <Grid templateColumns="1fr 3fr" gap={4}>
+          <Image
+            src={`https://jcwd011003.purwadhikabootcamp.com/api/${data.Stock.Product.productImg}`}
+            boxSize="100px"
+            objectFit="cover"
+          />
+          <Text
+            mt="1"
+            fontWeight="semibold"
+            as="h4"
+            lineHeight="tight"
+            isTruncated
+          >
+            {data.Stock.Product.name}
+          </Text>
+        </Grid>
+        <Text mt="1">Quantity: {quantity}</Text>
+        <Text mt="1">
+          Total Price: {tempQuantity * parseFloat(data.Stock.Product.price)}
         </Text>
-      </Grid>
-      <Text mt="1">Quantity: {quantity}</Text>
-      <Text mt="1">Total Price: {tempQuantity * parseFloat(data.Stock.Product.price)}</Text>
-      <Text mt="1">Stock Left: {data.Stock.qty}</Text>
-      <HStack spacing={2}>
-        <Button onClick={handleDecrement}>-</Button>
-        <Text display="inline-block" mx="2">{tempQuantity}</Text>
-        <Button onClick={handleIncrement}>+</Button>
-        <Button colorScheme="blue" onClick={handleButtonClick}>Update</Button>
-     <Button colorScheme="red" onClick={handleRemove}>Remove</Button>
-      </HStack>
-    </VStack>
-   </>
+        <Text mt="1">Stock Left: {data.Stock.qty}</Text>
+        <HStack spacing={2}>
+          <Button onClick={handleDecrement}>-</Button>
+          <Text display="inline-block" mx="2">
+            {tempQuantity}
+          </Text>
+          <Button onClick={handleIncrement}>+</Button>
+          <Button colorScheme="blue" onClick={handleButtonClick}>
+            Update
+          </Button>
+          <Button colorScheme="red" onClick={handleRemove}>
+            Remove
+          </Button>
+        </HStack>
+      </VStack>
+    </>
   );
 };
 

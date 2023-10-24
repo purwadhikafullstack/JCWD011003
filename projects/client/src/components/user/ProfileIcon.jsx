@@ -34,7 +34,7 @@ const Profile = () => {
   
   const handleLogout = () => {
     localStorage.removeItem("token");
-    // window.location.href = 'http://localhost:3000/';
+    window.location.href = 'https://jcwd011003.purwadhikabootcamp.com/';
   };
 
   useEffect (() => {

@@ -4,9 +4,12 @@ const User = db.User;
 const Transaction_Stock = db.Transaction_Stock;
 const Transaction_Payment = db.Transaction_Payment;
 const Transaction_Status = db.Transaction_Status;
+const Transaction_Voucher = db.Transaction_Voucher;
 const Stock_History = db.Stock_History;
 const Stock = db.Stock;
 const Branch = db.Branch;
+const Voucher = db.Voucher;
+const User_Voucher = db.User_Voucher;
 
 async function getTransactionUser (req, res) {
     try {
@@ -214,14 +217,37 @@ async function getStockHistoryIdByBranch(req, res) {
               model: Transaction_Stock,
           },
           {
-            model:Transaction_Payment ,
+            model: Transaction_Payment ,
           },
           {
             model: Transaction_Status,
             attributes: ['status']
+          },
+          {
+            model: Transaction_Voucher
           }
-      ]
-      })
+        ]
+    })
+      
+    const userVoucherPromises = transaction.Transaction_Vouchers.map(async (transaction_voucher) => {
+      return User_Voucher.findOne({
+        include: [
+          {
+            model: Voucher
+          }
+        ],
+        where: {
+          id: transaction_voucher.id_user_voucher
+        }
+      });
+    });
+    
+
+    const userVouchers = await Promise.all(userVoucherPromises);
+    
+    transaction.Transaction_Vouchers.forEach((transaction_voucher, index) => {
+      transaction_voucher.dataValues.User_Voucher = userVouchers[index];
+    });
       res.status(200).json(transaction)
     } catch (error) {
       console.error('Error:', error);
