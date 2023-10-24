@@ -20,10 +20,10 @@ async function hashPass(password) {
     return await bcrypt.hash(password, salt);
 }
 
-async function isExist(name, email, phone, referred_by ) {
+async function isExist(name, email, phone ) {
     const checkAccount = await users.findAll({
         where: {
-            [Op.or]: [{ name }, { email }, { phone }, { referred_by }],
+            [Op.or]: [{ name }, { email }, { phone }],
         },
     });
     if (checkAccount.length === 0) return false;

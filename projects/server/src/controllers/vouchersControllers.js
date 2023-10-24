@@ -2,6 +2,7 @@ const { default: axios } = require("axios");
 const db = require("../models");
 const Voucher = db.Voucher;
 const Category = db.Category;
+const User_Voucher = db.User_Voucher;
 const cron = require("node-cron");
 
 const vouchersControllers = {
@@ -10,7 +11,9 @@ const vouchersControllers = {
       try {
         const today = new Date();
 
-        const response = await axios.get("https://jcwd011003.purwadhikabootcamp.com/api/vouchers");
+        const response = await axios.get(
+          "https://jcwd011003.purwadhikabootcamp.com/api/vouchers"
+        );
         const vouchers = response.data;
 
         for (const voucher of vouchers) {
@@ -166,6 +169,27 @@ const vouchersControllers = {
           {
             model: Category,
             attributes: ["id", "category"],
+          },
+        ],
+      });
+
+      return res.status(200).json(vouchers);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error fetching vouchers" });
+    }
+  },
+  getAllUserVouchers: async (req, res) => {
+    try {
+      const { id } = req.account;
+      const vouchers = await User_Voucher.findAll({
+        where: {
+          id_user: id,
+          isUsed: false,
+        },
+        include: [
+          {
+            model: Voucher,
           },
         ],
       });

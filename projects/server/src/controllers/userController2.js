@@ -11,6 +11,9 @@ const Stock_Promos = db.Stock_Promos;
 const Address = db.User_Address
 const Branch = db.Branch
 const Stock_History = db.Stock_History;
+const Transaction_Voucher = db.Transaction_Voucher
+const Voucher = db.Voucher
+const User_Voucher = db.User_Voucher
 
 async function deleteCartItems (req,res) {
     const { id_stock } = req.body;
@@ -70,8 +73,8 @@ async function createTransaction (req, res) {
       id_user: cart.id_user,
       totPrice: cart.totPrice,
       totQty: cart.totQty,
-      totPriceDiscount: cart.totDiscount,
-      totWeight: cart.totWeight,
+      totPriceDiscount: Number(cart.totDiscount) + Number(req.body.voucherDiscount),
+      totWeight: cart.totWeight, 
       // Copy any other columns from Cart that need to be included in the Transaction
     };
 
@@ -83,8 +86,11 @@ async function createTransaction (req, res) {
       shippingMethod,
       shippingCost,
       shippingCostDiscount,
-      // Add any other properties from the request body here
+      idOng, 
+      idBel,
     } = req.body;
+    
+    
 
     // Add the additional data to the transactionData
     transactionData.userAddress = userAddress,
@@ -96,6 +102,32 @@ async function createTransaction (req, res) {
 
     // Create a new Transaction with the copied data
     const newTransaction = await Transaction.create(transactionData);
+
+    if(idOng) {
+      try {
+          const voucher = await Transaction_Voucher.create({
+            id_user_voucher: idOng,
+            id_transaction: newTransaction.id
+          })
+        const used = await User_Voucher.update({isUsed: true}, {where:{
+          id: idOng
+        }})
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (idBel) {
+      try {
+        const voucher = await Transaction_Voucher.create({
+          id_user_voucher: idBel,
+          id_transaction: newTransaction.id // Fixed the typo in id_transaction
+        });
+        const used = await User_Voucher.update({ isUsed: true }, { where: { id: idBel } });
+      } catch (error) {
+        console.error(error); // Handle or log the error
+      }
+    }
 
     // Find the associated Cart_Stock records
     const cartStocks = await Cart_Stock.findAll({
