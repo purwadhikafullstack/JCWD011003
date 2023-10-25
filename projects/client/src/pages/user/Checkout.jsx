@@ -83,10 +83,10 @@ function Checkout() {
         );
         console.log("vouc", response);
         setBelData(
-          response.data.filter((item) => item.Voucher.name.includes("BEL"))
+          response.data.filter((item) => /BEL/i.test(item.Voucher.name))
         );
         setOngData(
-          response.data.filter((item) => item.Voucher.name.includes("ONG"))
+          response.data.filter((item) => /ONG/i.test(item.Voucher.name))
         );
         setMinBel(
           belData.reduce(
