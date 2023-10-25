@@ -52,7 +52,7 @@ const ListProduct = () => {
   const [orderByName, setOrderByName] = useState("");
   const [orderByPrice, setOrderByPrice] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(2);
+  const [totalPages, setTotalPages] = useState(3);
   const handleFilterProductName = (e) => {
     setFilterProductName(e.target.value);
   };

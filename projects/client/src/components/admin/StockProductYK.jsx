@@ -30,7 +30,7 @@ const StockProductYK = () => {
     id_stock_promo: "",
     isActive: "",
   });
-
+  const token = localStorage.getItem("token");
   const [promoOptions, setPromoOptions] = useState([]);
 
   const [filterProductName, setFilterProductName] = useState("");
@@ -58,17 +58,21 @@ const StockProductYK = () => {
     const customQty = window.prompt("Enter the quantity to add:", "1");
     if (customQty !== null) {
       try {
-        const response = await fetch("https://jcwd011003.purwadhikabootcamp.com/api/stock/add", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id_product: stock.id_product,
-            id_branch: stock.id_branch,
-            qty: parseInt(customQty),
-          }),
-        });
+        const response = await fetch(
+          "https://jcwd011003.purwadhikabootcamp.com/api/stock/add",
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              id_product: stock.id_product,
+              id_branch: stock.id_branch,
+              qty: parseInt(customQty),
+            }),
+          }
+        );
 
         if (response.ok) {
           toast({
@@ -114,17 +118,21 @@ const StockProductYK = () => {
     const customQty = window.prompt("Enter the quantity to reduce:", "1");
     if (customQty !== null) {
       try {
-        const response = await fetch("https://jcwd011003.purwadhikabootcamp.com/api/stock/reduce", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id_product: stock.id_product,
-            id_branch: stock.id_branch,
-            qty: parseInt(customQty),
-          }),
-        });
+        const response = await fetch(
+          "https://jcwd011003.purwadhikabootcamp.com/api/stock/reduce",
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              id_product: stock.id_product,
+              id_branch: stock.id_branch,
+              qty: parseInt(customQty),
+            }),
+          }
+        );
 
         if (response.ok) {
           toast({
@@ -176,20 +184,23 @@ const StockProductYK = () => {
 
   const handleFormSubmit = async () => {
     try {
-      const response = await fetch("https://jcwd011003.purwadhikabootcamp.com/api/stock", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id_product: selectedStock.id_product,
-          id_branch: selectedStock.id_branch,
-          qty: parseInt(formData.qty),
-          discountPercent: parseInt(formData.discountPercent),
-          id_stock_promo: parseInt(formData.id_stock_promo),
-          isActive: formData.isActive === "1" ? true : false,
-        }),
-      });
+      const response = await fetch(
+        "https://jcwd011003.purwadhikabootcamp.com/api/stock",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_product: selectedStock.id_product,
+            id_branch: selectedStock.id_branch,
+            qty: parseInt(formData.qty),
+            discountPercent: parseInt(formData.discountPercent),
+            id_stock_promo: parseInt(formData.id_stock_promo),
+            isActive: formData.isActive === "1" ? true : false,
+          }),
+        }
+      );
 
       if (response.ok) {
         const updatedStock = await response.json();
@@ -256,12 +267,12 @@ const StockProductYK = () => {
       setCurrentPage(currentPage - 1);
     }
   };
-  
+
   const handleNextClick = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
-  }
+  };
 
   useEffect(() => {
     fetch(
@@ -442,7 +453,12 @@ const StockProductYK = () => {
         )}
       </Box>
       <Box mt={2} display="flex" justifyContent="center">
-        <Button m={1} colorScheme="teal" onClick={handlePrevClick} disabled={currentPage === 1}>
+        <Button
+          m={1}
+          colorScheme="teal"
+          onClick={handlePrevClick}
+          disabled={currentPage === 1}
+        >
           Previous
         </Button>
         {pages.map((page) => (
@@ -456,7 +472,12 @@ const StockProductYK = () => {
             {page}
           </Button>
         ))}
-        <Button m={1} colorScheme="teal" onClick={handleNextClick} disabled={currentPage === pages.length}>
+        <Button
+          m={1}
+          colorScheme="teal"
+          onClick={handleNextClick}
+          disabled={currentPage === pages.length}
+        >
           Next
         </Button>
       </Box>

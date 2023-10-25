@@ -165,7 +165,7 @@ const stockControllers = {
   addStockProduct: async (req, res) => {
     try {
         const { id_product, id_branch, qty } = req.body;
-
+      
         // Find the existing stock record or create a new one if it doesn't exist
         let stock = await Stock.findOne({
             where: {
@@ -173,7 +173,7 @@ const stockControllers = {
                 id_branch,
             },
         });
-
+        
         if (!stock) {
             stock = await Stock.create({
                 id_product,
@@ -192,14 +192,6 @@ const stockControllers = {
         await stock.save();
 
         // Create a Stock_History record to log the change
-        await Stock_History.create({
-            id_stock: stock.id,  // Assuming 'id' is the primary key of the Stock model
-            changeQty: qty,
-            totalQty: stock.qty,
-            changedBy: 'Stock Addition', // Assuming you have user information in the request
-            actor: `Admin id${req.account.id}`, // Assuming you have user information in the request
-            // You can add more information to the history record as needed
-        });
 
         // Fetch the updated stock with related data
         const updatedStock = await Stock.findOne({
@@ -222,7 +214,16 @@ const stockControllers = {
                 },
             ],
         });
-
+        const histo = await Stock_History.create({
+          id_stock: stock.dataValues.id,  // Assuming 'id' is the primary key of the Stock model
+          changeQty: qty,
+          totalQty: stock.qty,
+          changedBy: 'Stock Addition', // Assuming you have user information in the request
+          id_change: req.account.id, // Assuming you have user information in the request
+          actor: `Admin id${req.account.id}`, // Assuming you have user information in the request
+          // You can add more information to the history record as needed
+      });
+      console.log('histo',histo)
         return res.status(200).json({
             message: "Stock added successfully",
             stock: updatedStock,
@@ -264,14 +265,7 @@ const stockControllers = {
         await stock.save();
 
         // Create a Stock_History record to log the change
-        Stock_History.create({
-          id_stock: stock.id,  // Assuming 'id' is the primary key of the Stock model
-          changeQty: -qty,
-          totalQty: stock.qty,
-          changedBy: 'Stock reduction', // Assuming you have user information in the request
-          actor: `Admin id${req.account.id}`, // Assuming you have user information in the request
-            // You can add more information to the history record as needed
-        });
+        
 
         // Fetch the updated stock with related data
         const updatedStock = await Stock.findOne({
@@ -293,6 +287,16 @@ const stockControllers = {
                     attributes: ["id", "promoName"],
                 },
             ],
+        });
+
+        await Stock_History.create({
+          id_stock: stock.dataValues.id,  // Assuming 'id' is the primary key of the Stock model
+          changeQty: -qty,
+          totalQty: stock.qty,
+          changedBy: 'Stock reduction', // Assuming you have user information in the request
+          id_change: req.account.id, // Assuming you have user information in the request
+          actor: `Admin id${req.account.id}`, // Assuming you have user information in the request
+            // You can add more information to the history record as needed
         });
 
         return res.status(200).json({

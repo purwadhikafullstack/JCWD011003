@@ -21,7 +21,6 @@ app.use(
   
   app.use('/api', apiRouter)
   apiRouter.use('/user', userRouter)
-  // apiRouter.use('/admin', apiRouter,adminRouter)
   apiRouter.use('/profile', profileRouter)
   apiRouter.use('/rajaongkir', rajaongkirRouter)
   apiRouter.use('/auth', authRouter)
@@ -35,33 +34,11 @@ app.use(
   apiRouter.use('/admin', adminRouter)
 
 
-// app.use('/api', apiRouter)
-// const {authRouter, userRouter} = require('./router')
-//#region API ROUTES
-// app.use("/public", express.static(path.resolve(__dirname,"../public")))
-// app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
-
 if(__dirname.split("/").includes("www")) {
   app.use("/api/public", express.static(path.resolve(__dirname, "../../../public")))
 } else{
   app.use("/api/public", express.static(path.resolve(__dirname, "../public")))
 }
-// vouchersControllers.scheduleDeleteExpiredVouchers();
-
-// ===========================
-// NOTE : Add your routes here
-// apiRouter.use('/auth', authRouter)
-// app.get("/api", (req, res) => {
-//   res.send(`Hello, this is my API`);
-// });
-
-// app.get("/api/greetings", (req, res, next) => {
-//   res.status(200).json({
-//     message: "Hello, Student !",
-//   });
-// });
-
-// ===========================
 
 // not found
 app.use((req, res, next) => {

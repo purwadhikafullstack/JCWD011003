@@ -58,16 +58,28 @@ function Checkout() {
   };
 
   const handleOngChange = (event) => {
-    const ong = event.target.options[event.target.selectedIndex]; // Corrected the property names
-    setSelectedOng(event.target.value); // Set ong, not event.target.value
-    console.log("Selected Ong:", event.target.value); // Log the selected ong, not event.target.value
+    const ong = event.target.options[event.target.selectedIndex];
+    setSelectedOng(event.target.value);
+    console.log("Selected Ong:", event.target.value);
     updateBody({
       idOng: Number(event.target.value),
       shippingCostDiscount: Number(ong.getAttribute("data-ongamount")),
-    }); // Pass ong to updateBody
+    });
   };
 
-  // const [isLargerThanMobile] = useMediaQuery("(min-width: 600px)");
+  const formatPriceAsIDR = (price) => {
+    const numericPrice = parseFloat(price);
+    if (isNaN(numericPrice)) {
+      return "";
+    }
+    const formatter = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
+    return formatter.format(numericPrice);
+  };
   const token = localStorage.getItem("token");
   const authorizationHeader = token ? `Bearer ${token}` : "";
   useEffect(() => {
@@ -136,8 +148,8 @@ function Checkout() {
         title: "Unfinished Porcess",
         description: "Please finish the process.",
         status: "error",
-        duration: 5000, // Toast duration in milliseconds
-        isClosable: true, // Allow the user to close the toast
+        duration: 5000,
+        isClosable: true,
       });
     }
   };
@@ -163,10 +175,10 @@ function Checkout() {
         setResponse2(response.data);
         console.log("res2", response);
         const numb = response.data[0].Stock.id_branch;
-        console.log("br", numb);
+        // console.log("br", numb);
         setBranch(numb);
         updateBody({ id_branch: numb });
-        console.log("useeffect", branch);
+        // console.log("useeffect", branch);
       } catch (error) {
         console.error("Error fetching data from API 2:", error);
       }
@@ -194,7 +206,7 @@ function Checkout() {
         }
         setResponse1(response.data);
         updateShip({ weight: response.data.totWeight });
-        // updateBody({totWeight:response.data.totWeight, totPrice: response.data.totPrice, totQty: response.data.totQty, totDiscount: response.data.totDiscount})
+
         console.log("res1", response);
         setLoading(false);
       } catch (error) {
@@ -237,7 +249,6 @@ function Checkout() {
     updateBody({
       userAddress: selectedOption.getAttribute("data-user-address"),
     });
-    // console.log("selected address",event.target.value)
   };
 
   const toggleShowMore = () => {
@@ -263,9 +274,6 @@ function Checkout() {
     console.log("event", event.target.value);
   };
   useEffect(() => {
-    // console.log('service', service)
-    // console.log('address', addresses)
-    // console.log(selectedService)
     console.log("body", body);
   }, [service, selectedService, addresses, body]);
   useEffect(() => {
@@ -275,7 +283,7 @@ function Checkout() {
           "https://jcwd011003.purwadhikabootcamp.com/api/rajaongkir/cost",
           shipping
         );
-        console.log("bangasat", shippingData.data.rajaongkir);
+        // console.log("bangasat", shippingData.data.rajaongkir);
         setService(shippingData.data.rajaongkir.results[0].costs);
         updateBody({ shipper: shippingData.data.rajaongkir.results[0].name });
       } catch (error) {
@@ -293,7 +301,6 @@ function Checkout() {
 
   const handleCheckoutConfirmation = async () => {
     try {
-      // Example API call
       const response = await axios.post(
         "https://jcwd011003.purwadhikabootcamp.com/api/user/checkout",
         body,
@@ -304,28 +311,24 @@ function Checkout() {
         }
       );
 
-      // Check the response status code to ensure success
-      // Replace '200' with the appropriate success status code
       if (response.status === 201) {
         setIsModalOpen(false);
         navigate("/payment");
       }
     } catch (error) {
       console.error("Error during checkout:", error);
-      // Handle any errors or display an error message if needed
+
       toast({
         title: "API Error",
         description:
           "An error occurred during checkout. Please try again later.",
         status: "error",
-        duration: 5000, // Toast duration in milliseconds
-        isClosable: true, // Allow the user to close the toast
+        duration: 5000,
+        isClosable: true,
       });
     }
   };
-  // let belMinTotPrice = belData.reduce((min, p) => p.Voucher.minTotPrice < min ? p.Voucher.minTotPrice : min,belData[0].Voucher.minTotPrice);
-  // let ongMinTotPrice = ongData.reduce((min, p) => p.Voucher.minTotPrice < min ? p.Voucher.minTotPrice : min,ongData[0].Voucher.minTotPrice);
-  // console.log('smolbel', belMinTotPrice)
+
   const filteredOngData = ongData.filter(
     (item) => item.Voucher.minTotPrice <= response1.totPrice
   );
@@ -388,7 +391,17 @@ function Checkout() {
                   .map((item, index) => (
                     <Box key={index} mb="4">
                       <Text>Item {item.Stock.Product.name}</Text>
-                      <Text>Price: {item.price}</Text>
+                      <Text>
+                        Price:{" "}
+                        {formatPriceAsIDR(
+                          item.qty *
+                            parseFloat(
+                              item.Stock.Product.price *
+                                ((100 - item.Stock.discountPercent) / 100)
+                            )
+                        )}
+                      </Text>
+                      {/* parseFloat((response1.Stock.Product.price * ((100 -item.Stock.discountPercent)/100))  */}
                       {/* Add more fields as needed */}
                     </Box>
                   ))}
@@ -403,33 +416,40 @@ function Checkout() {
                 <Heading as="h2" size="md" mb="2">
                   Cart:
                 </Heading>
-                <Text> Total Price: {response1.totPrice}</Text>
+                <Text>
+                  {" "}
+                  Total Price: {formatPriceAsIDR(response1.totPrice)}
+                </Text>
                 <Text> Total Items: {response1.totQty}</Text>
-                <Text> Total Weight: {response1.totWeight}</Text>
+                <Text> Total Weight: {response1.totWeight}gr</Text>
                 <Text>
                   {" "}
                   Total Shipping Cost:{" "}
-                  {selectedService - Number(body.shippingCostDiscount)}
+                  {formatPriceAsIDR(
+                    selectedService - Number(body.shippingCostDiscount)
+                  )}
                 </Text>
                 <Text>
                   {" "}
                   Total Product Discount:{" "}
-                  {response1.totDiscount + Number(body.voucherDiscount)}
+                  {formatPriceAsIDR(
+                    response1.totDiscount + Number(body.voucherDiscount)
+                  )}
                 </Text>
 
                 <br />
-                {filteredBelData.length === 0 && belData.length !== 0 &&  (
+                {filteredBelData.length === 0 && belData.length !== 0 && (
                   <Text mb="2">
                     {" "}
-                    You are Rp.{minBel - response1.totPrice} short to use your
-                    goods voucher{" "}
+                    You are {formatPriceAsIDR(minBel - response1.totPrice)}{" "}
+                    short to use your goods voucher{" "}
                   </Text>
                 )}
                 {filteredOngData.length === 0 && ongData.length !== 0 && (
                   <Text mb="2">
                     {" "}
-                    You are Rp.{minOng - response1.totPrice} short to use your
-                    delivery voucher{" "}
+                    You are {formatPriceAsIDR(minOng - response1.totPrice)}{" "}
+                    short to use your delivery voucher{" "}
                   </Text>
                 )}
                 <Flex
@@ -597,7 +617,7 @@ function Checkout() {
                       </Select>
                     </Box>
                   </Box>
-                  <Box display="flex" justifyContent="flex-end" mt="4">
+                  <Box display="flex" justifyContent="left" mt="4">
                     <Button colorScheme="teal" onClick={handleCheckout}>
                       Checkout
                     </Button>

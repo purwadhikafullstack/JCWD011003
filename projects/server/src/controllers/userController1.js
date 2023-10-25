@@ -70,7 +70,7 @@ async function updateCart(req, res) {
       const totPrice = cartStockItems.reduce((total, item) => total + item.price, 0);
       const totQty = cartStockItems.reduce((total, item) => total + item.qty, 0);
       const totWeight = cartStockItems.reduce((total, item) => total + item.weight, 0);
-      const totDiscount = cartStockItems.reduce((total, item) => total + item.discouunt, 0);
+      const totDiscount = cartStockItems.reduce((total, item) => total + item.discount, 0);
 
       // Check if the stock item has a stock promo
       // if (stockItem.id_stock_promo) {

@@ -32,7 +32,7 @@ function DataTable() {
           },
         }
       );
-      console.log("his", result);
+      // //console.log('his',result)
       setData(result.data);
     };
 
@@ -42,16 +42,12 @@ function DataTable() {
   const columns = useMemo(
     () => [
       {
-        Header: "Transaction ID",
+        Header: "ID",
         accessor: "id",
       },
       {
         Header: "Change in Stock",
         accessor: "changeQty",
-      },
-      {
-        Header: "Branch",
-        accessor: "Stock.Branch.name",
       },
       {
         Header: "Changed by",
@@ -61,6 +57,10 @@ function DataTable() {
         Header: "Changer",
         accessor: "actor",
         Cell: ({ value }) => (value === null ? 0 : value),
+      },
+      {
+        Header: "Date",
+        accessor: "createdAt",
       },
     ],
     []
@@ -81,6 +81,7 @@ function DataTable() {
     {
       columns,
       data,
+      initialState: { pageSize: 5 },
     },
     useSortBy,
     usePagination
