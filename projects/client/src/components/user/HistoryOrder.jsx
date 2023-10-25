@@ -70,7 +70,7 @@ const handleAction = async (id, action) => {
   if (action === 'Cancel') {
     console.log('cancel', id);
     try {
-      const resCancel = await axios.patch(`https://jcwd011003.purwadhikabootcamp.com/api/user/confirm/${id}`, null, {
+      const resCancel = await axios.patch(`https://jcwd011003.purwadhikabootcamp.com/api/user/cancel/${id}`, null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

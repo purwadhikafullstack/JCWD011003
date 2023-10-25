@@ -418,14 +418,14 @@ function Checkout() {
                 </Text>
 
                 <br />
-                {filteredBelData.length === 0 && (
+                {filteredBelData.length === 0 && belData.length !== 0 &&  (
                   <Text mb="2">
                     {" "}
                     You are Rp.{minBel - response1.totPrice} short to use your
                     goods voucher{" "}
                   </Text>
                 )}
-                {filteredOngData.length === 0 && (
+                {filteredOngData.length === 0 && ongData.length !== 0 && (
                   <Text mb="2">
                     {" "}
                     You are Rp.{minOng - response1.totPrice} short to use your
