@@ -158,6 +158,9 @@ async function getAllStockHistory(req, res) {
     const stocks = await Stock_History.findAll({
       include: {
         model: Stock,
+        include: [{
+          model: Branch
+        }]
       },
     });
 
