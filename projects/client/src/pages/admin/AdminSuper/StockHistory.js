@@ -8,6 +8,7 @@ import {
   Td,
   IconButton,
   Box,
+  Select,
 } from "@chakra-ui/react";
 import {
   TriangleDownIcon,
@@ -21,7 +22,7 @@ import axios from "axios";
 function StockHistorySuper() {
   const [data, setData] = useState([]);
   const token = localStorage.getItem("token");
-
+  const [filterInput, setFilterInput] = useState("");
   useEffect(() => {
     const fetchData = async () => {
       const result = await axios.get(
@@ -32,7 +33,7 @@ function StockHistorySuper() {
           },
         }
       );
-      console.log("his", result);
+      //console.log('his',result)
       setData(result.data);
     };
 
@@ -42,7 +43,7 @@ function StockHistorySuper() {
   const columns = useMemo(
     () => [
       {
-        Header: "Transaction ID",
+        Header: "ID",
         accessor: "id",
       },
       {
@@ -62,10 +63,31 @@ function StockHistorySuper() {
         accessor: "actor",
         Cell: ({ value }) => (value === null ? 0 : value),
       },
+      {
+        Header: "Date",
+        accessor: "createdAt",
+      },
     ],
     []
   );
+  const handleFilterChange = (e) => {
+    const value = e.target.value || undefined;
+    setFilterInput(value);
+  };
+  const filteredData = useMemo(() => {
+    if (filterInput === "All Branches") {
+      return data;
+    }
+    return data.filter((item) => {
+      return item.Stock.Branch.name.includes(filterInput);
+    });
+  }, [data, filterInput]);
 
+  // Create a list of all possible branches
+  const branches = useMemo(() => {
+    const branches = new Set(data.map((item) => item.Stock.Branch.name));
+    return Array.from(branches);
+  }, [data]);
   const {
     getTableProps,
     getTableBodyProps,
@@ -80,7 +102,8 @@ function StockHistorySuper() {
   } = useTable(
     {
       columns,
-      data,
+      data: filteredData,
+      initialState: { pageSize: 5 },
     },
     useSortBy,
     usePagination
@@ -88,6 +111,12 @@ function StockHistorySuper() {
 
   return (
     <Box>
+      <Select placeholder="Select branch" onChange={handleFilterChange}>
+        <option value="All Branches">All Branches</option>
+        {branches.map((branch) => (
+          <option value={branch}>{branch}</option>
+        ))}
+      </Select>
       <Table {...getTableProps()}>
         <Thead>
           {headerGroups.map((headerGroup) => (

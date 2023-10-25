@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import DatePicker from 'react-datepicker';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -7,6 +7,7 @@ import {
   useSortBy,
   useFilters,
   useGlobalFilter,
+  usePagination
 } from 'react-table';
 import {
   Table,
@@ -18,6 +19,7 @@ import {
   Input,
   Box,
   Select,
+  IconButton,
   
 } from '@chakra-ui/react';
 
@@ -31,80 +33,77 @@ function generateBranchOptions(data) {
     return [...branchSet];
   }
 
-// Define a default filter function for text columns
+  function generateUserOptions(data) {
+    const userSet = new Set();
+    data.forEach((item) => {
+      if (item.User && item.User.name) {
+        userSet.add(item.User.name);
+      }
+    });
+    return [...userSet];
+}
+
+function generateStatusOptions(data) {
+    const statusSet = new Set();
+    data.forEach((item) => {
+      if (item.Transaction_Status && item.Transaction_Status.status) {
+        statusSet.add(item.Transaction_Status.status);
+      }
+    });
+    return [...statusSet];
+}
+
 const defaultColumn = {
   Filter: DefaultColumnFilter,
 };
 
-// Create a custom filter component
 function DefaultColumnFilter({ column }) {
   const { filterValue, setFilter } = column;
 
-  return (
-    <Input
-      value={filterValue || ''}
-      onChange={(e) => setFilter(e.target.value || undefined)}
-      placeholder={`Filter ${column.Header}`}
-    />
-  );
+  // return (
+  //   <Input
+  //     value={filterValue || ''}
+  //     onChange={(e) => setFilter(e.target.value || undefined)}
+  //     placeholder={`Filter ${column.Header}`}
+  //   />
+  // );
 }
-
-// Define your table component
 function TransactionTable({ data }) {
     const branchOptions = generateBranchOptions(data);
-    const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const handleDateRangeChange = (start, end) => {
-    setStartDate(start);
-    setEndDate(end);
-  };
-
-  // Filter function for date range
-  const dateRangeFilter = ({ id, value }, rows) => {
-    if (id === 'createdAt') {
-      return rows.filter((row) => {
-        const rowDate = new Date(row.values[id]).getTime();
-        if (startDate && endDate) {
-          const startUTC = startDate.toUTCString();
-          const endUTC = new Date(endDate.getTime() + 24 * 60 * 60 * 1000).toUTCString(); // Add one day to the end date
-          return rowDate >= new Date(startUTC).getTime() && rowDate <= new Date(endUTC).getTime();
-        } else if (startDate) {
-          const startUTC = startDate.toUTCString();
-          return rowDate >= new Date(startUTC).getTime();
-        } else if (endDate) {
-          const endUTC = new Date(endDate.getTime() + 24 * 60 * 60 * 1000).toUTCString();
-          return rowDate <= new Date(endUTC).getTime();
-        }
-        return true;
-      });
-    }
-    return rows;
-  };
-
+    const userOptions = generateUserOptions(data);
+    const statusOptions = generateStatusOptions(data);
+    const [activeFilter, setActiveFilter] = useState(null);
+  const [selectedUser, setSelectedUser] = useState('All Users');
+  const [selectedStatus, setSelectedStatus] = useState('All Statuses');
+  const [selectedBranch, setSelectedBranch] = useState('All Branches');
   const columns = React.useMemo(
     () => [
-      // Define your columns here
-      // For example:
       {
-        Header: 'ID',
-        accessor: 'id',
+        Header: "ID",
+        accessor: "id",
       },
       {
-        Header: 'User Address',
-        accessor: 'userAddress',
-        Filter: 'text', // Use the default text filter
+        Header: "User Name",
+        accessor: "User.name",
       },
       {
-        Header: 'Branch',
-        accessor: 'Branch.name',
-        Filter: 'text',
+        Header: "Status",
+        accessor: "Transaction_Status.status",
       },
       {
-        Header: 'Created At',
-        accessor: 'createdAt',
-        Filter: 'text',
+        Header: "Branch",
+        accessor: "Branch.name",
       },
-      // Add more columns as needed
+      {
+        Header: "Transaction Created",
+        accessor: "createdAt",
+        Cell: ({ value }) => new Date(value).toLocaleString(),
+      },
+      {
+        Header: "Transaction Updated",
+        accessor: "updatedAt",
+        Cell: ({ value }) => new Date(value).toLocaleString(),
+      },
     ],
     []
   );
@@ -116,62 +115,106 @@ const navigate = useNavigate()
     rows,
     prepareRow,
     state,
-    preGlobalFilteredRows,
+    page,
+    canPreviousPage,
+    canNextPage,
+    nextPage,
+    previousPage,
+    state: { pageIndex },
     setGlobalFilter,
   } = useTable(
     {
         columns,
         data,
         defaultColumn,
-        // Add your custom filter functions
-        filterTypes: {
-          dateRange: dateRangeFilter,
-        },
+        initialState: { pageSize: 5 },
+       
       },
-    useFilters, // Use the filtering plugin
-    useGlobalFilter, // Use the global filter plugin
-    useSortBy // Use sorting plugin
+    useFilters, 
+    useGlobalFilter, 
+    useSortBy,
+    usePagination
   );
-function checker (data) {
-  console.log(data)
-}
+
+  const handleFilterChange = (filterIndex, selectedValue) => {
+    setActiveFilter(filterIndex); // Set the currently active filter
+    setGlobalFilter(selectedValue === `All ${filterIndex === 3 ? 'Users' : filterIndex === 4 ? 'Statuses' : 'Branches'}` ? '' : selectedValue, filterIndex);
+    
+    // Update the selected values based on the filter
+    switch (filterIndex) {
+      case 3:
+        setSelectedUser(selectedValue);
+        break;
+      case 4:
+        setSelectedStatus(selectedValue);
+        break;
+      case 2:
+        setSelectedBranch(selectedValue);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFilters = () => {
+    setActiveFilter(null); // Clear the active filter
+    setGlobalFilter('', -1); // Clear all filters
+
+    // Reset the selected values
+    setSelectedUser('All Users');
+    setSelectedStatus('All Statuses');
+    setSelectedBranch('All Branches');
+  };
+
+  const getDefaultValue = (filterIndex) => {
+    if (filterIndex === activeFilter) {
+      // Return the selected filter's value
+      return state.filters[filterIndex]?.value || 'All Users';
+    }
+    // Return the default value for other filters
+    return `All ${filterIndex === 3 ? 'Users' : filterIndex === 4 ? 'Statuses' : 'Branches'}`;
+  };  
   return (
     <Box>
-        <div>
-        {/* Date picker for start date */}
-        <DatePicker
-          selected={startDate}
-          onChange={date => handleDateRangeChange(date, endDate)}
-          selectsStart
-          startDate={startDate}
-          endDate={endDate}
-          placeholderText="Start Date"
-        />
-        {/* Date picker for end date */}
-        <DatePicker
-          selected={endDate}
-          onChange={date => handleDateRangeChange(startDate, date)}
-          selectsEnd
-          startDate={startDate}
-          endDate={endDate}
-          minDate={startDate}
-          placeholderText="End Date"
-        />
-      </div>
-      <Select
-  value={state.filters[2]?.value || 'All Branches'} // Assuming branch filter is the third column
-  onChange={(e) => {
-    const selectedBranch = e.target.value;
-    setGlobalFilter(selectedBranch === 'All Branches' ? '' : selectedBranch, 2);
-  }}
->
+       <Select
+        width={'400px'}
+        value={selectedUser}
+        onChange={(e) => handleFilterChange(3, e.target.value)}
+      >
+  <option value="All Users">All Users</option>
+  {userOptions.map((user) => (
+    <option key={user} value={user}>
+      {user}
+    </option>
+  ))} 
+</Select>
+
+
+<Select
+        width={'400px'}
+        value={selectedStatus}
+        onChange={(e) => handleFilterChange(4, e.target.value)}
+      >
+  <option value="All Statuses">All Statuses</option>
+  {statusOptions.map((status) => (
+    <option key={status} value={status}>
+      {status}
+    </option>
+  ))} 
+</Select>
+<Select
+        width={'400px'}
+        value={selectedBranch}
+        onChange={(e) => handleFilterChange(2, e.target.value)}
+      >
   <option value="All Branches">All Branches</option>
   {branchOptions.map((branch) => (
     <option key={branch} value={branch}>
       {branch}
     </option>
-  ))} {/* You were missing the closing parenthesis here */}
+  ))} 
 </Select>
+<button onClick={clearFilters}>Clear Filters</button>
       <Table {...getTableProps()}>
         <Thead>
           {headerGroups.map((headerGroup) => (
@@ -187,25 +230,41 @@ function checker (data) {
             </Tr>
           ))}
         </Thead>
+        
         <Tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <Tr {...row.getRowProps()}
-              onClick={() => navigate(`${row.original.id}`)}
-              >
-                {row.cells.map((cell) => {
-                  return (
-                    <Td {...cell.getCellProps()}>
-                      {cell.render('Cell')}
-                    </Td>
-                  );
-                })}
-              </Tr>
-            );
-          })}
-        </Tbody>
+  {page.map((row) => {
+    prepareRow(row);
+    return (
+      <Tr {...row.getRowProps()}
+      onClick={() => navigate(`${row.original.id}`)}
+      >
+        {row.cells.map((cell) => {
+          return (
+            <Td {...cell.getCellProps()}>
+              {cell.render('Cell')}
+            </Td>
+          );
+        })}
+      </Tr>
+    );
+  })}
+</Tbody>
       </Table>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <IconButton
+      onClick={() => previousPage()}
+      isDisabled={!canPreviousPage}
+      aria-label="Previous page"
+      icon={<ChevronLeftIcon />}
+    />
+    <div style={{ margin: '0 10px' }}>Page {pageIndex + 1}</div>
+    <IconButton
+      onClick={() => nextPage()}
+      isDisabled={!canNextPage}
+      aria-label="Next page"
+      icon={<ChevronRightIcon />}
+    />
+  </div>
     </Box>
   );
 }

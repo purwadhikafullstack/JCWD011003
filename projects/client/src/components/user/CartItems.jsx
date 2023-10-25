@@ -105,6 +105,20 @@ const CartItems = ({ data, onRemove }) => {
     console.log("tempQuantity:", tempQuantity);
   }, [tempQuantity]);
 
+  const formatPriceAsIDR = (price) => {
+    const numericPrice = parseFloat(price);
+    if (isNaN(numericPrice)) {
+      return "";
+    }
+    const formatter = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
+    return formatter.format(numericPrice);
+  };
+
   return (
     <>
       <VStack
@@ -134,7 +148,14 @@ const CartItems = ({ data, onRemove }) => {
         </Grid>
         <Text mt="1">Quantity: {quantity}</Text>
         <Text mt="1">
-          Total Price: {tempQuantity * parseFloat((data.Stock.Product.price * ((100 -data.Stock.discountPercent)/100)))}
+          Total Price:{" "}
+          {formatPriceAsIDR(
+            tempQuantity *
+              parseFloat(
+                data.Stock.Product.price *
+                  ((100 - data.Stock.discountPercent) / 100)
+              )
+          )}
         </Text>
         <Text mt="1">Stock Left: {data.Stock.qty}</Text>
         <HStack spacing={2}>
