@@ -134,7 +134,7 @@ const CartItems = ({ data, onRemove }) => {
         </Grid>
         <Text mt="1">Quantity: {quantity}</Text>
         <Text mt="1">
-          Total Price: {tempQuantity * parseFloat(data.Stock.Product.price)}
+          Total Price: {tempQuantity * parseFloat(data.Stock.Product.price * (1-data.Stock.discountPercent))}
         </Text>
         <Text mt="1">Stock Left: {data.Stock.qty}</Text>
         <HStack spacing={2}>
